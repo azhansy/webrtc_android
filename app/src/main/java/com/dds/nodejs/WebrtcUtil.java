@@ -17,7 +17,7 @@ import com.dds.webrtclib.ws.IConnectEvent;
 public class WebrtcUtil {
 
 
-    public static final String HOST = "47.93.186.97";
+    public static final String HOST = "coturn.aoidc.net";
 
     // turn and stun
     private static MyIceServer[] iceServers = {
@@ -26,11 +26,11 @@ public class WebrtcUtil {
             // 测试地址1
             new MyIceServer("stun:" + HOST + ":3478?transport=udp"),
             new MyIceServer("turn:" + HOST + ":3478?transport=udp",
-                    "ddssingsong",
-                    "123456"),
+                    "kaka",
+                    "kaka#kaka"),
             new MyIceServer("turn:" + HOST + ":3478?transport=tcp",
-                    "ddssingsong",
-                    "123456"),
+                    "kaka",
+                    "kaka#kaka"),
     };
 
     // signalling

@@ -23,6 +23,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_green_light"
                 android:gravity="center"
+                android:visibility="gone"
                 android:text="服务器使用nodejs" />
 
             <EditText
