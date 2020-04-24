@@ -2,6 +2,7 @@ package com.dds.nodejs;
 
 import android.app.Activity;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.dds.webrtclib.WebRTCManager;
 import com.dds.webrtclib.bean.MediaType;
@@ -51,7 +52,7 @@ public class WebrtcUtil {
 
             @Override
             public void onFailed(String msg) {
-
+                Toast.makeText(activity, "初始化WebRTC失败", Toast.LENGTH_LONG).show();
             }
         });
         WebRTCManager.getInstance().connect(videoEnable ? MediaType.TYPE_VIDEO : MediaType.TYPE_AUDIO, roomId);
@@ -70,7 +71,7 @@ public class WebrtcUtil {
 
             @Override
             public void onFailed(String msg) {
-
+                Toast.makeText(activity, "初始化WebRTC失败", Toast.LENGTH_LONG).show();
             }
         });
         WebRTCManager.getInstance().connect(MediaType.TYPE_MEETING, roomId);
