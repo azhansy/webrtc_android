@@ -26,12 +26,18 @@
                 android:visibility="gone"
                 android:text="服务器使用nodejs" />
 
-            <EditText
-                android:id="@+id/et_signal"
+<!--            <EditText-->
+<!--                android:id="@+id/et_signal"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="server地址(如ws://192.168.1.123:3000)" />-->
+            <Spinner
+                android:id="@+id/spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="server地址(如ws://192.168.1.123:3000)" />
-
+                android:layout_gravity="left"
+                android:entries="@array/test_array"
+                android:padding="10dp" />
 
             <EditText
                 android:id="@+id/et_room"
