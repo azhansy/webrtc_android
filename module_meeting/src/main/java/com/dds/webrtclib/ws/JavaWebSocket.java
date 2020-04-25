@@ -131,64 +131,78 @@ public class JavaWebSocket implements IWebSocket {
     //============================需要发送的=====================================
     @Override
     public void joinRoom(String room) {
+        // {"ct":"skyrtc","ac":"join_room","room_id":"232343"}
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__join");
-        Map<String, String> childMap = new HashMap<>();
-        childMap.put("room", room);
-        map.put("data", childMap);
+        map.put("ct", "skyrtc");
+        map.put("ac", "join_room");
+        map.put("room_id", room);
+//        Map<String, String> childMap = new HashMap<>();
+//        childMap.put("room", room);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
         mWebSocketClient.send(jsonString);
     }
 
-    public void sendAnswer(String socketId, String sdp) {
+    public void sendAnswer(String socketId, String sdp, String room_id) {
         Map<String, Object> childMap1 = new HashMap();
         childMap1.put("type", "answer");
         childMap1.put("sdp", sdp);
-        HashMap<String, Object> childMap2 = new HashMap();
-        childMap2.put("socketId", socketId);
-        childMap2.put("sdp", childMap1);
-        HashMap<String, Object> map = new HashMap();
-        map.put("eventName", "__answer");
-        map.put("data", childMap2);
-        JSONObject object = new JSONObject(map);
+//        HashMap<String, Object> childMap2 = new HashMap();
+        childMap1.put("socketId", socketId);
+//        childMap1.put("sdp", childMap1);
+//        HashMap<String, Object> map = new HashMap();
+//        map.put("eventName", "answer");
+        childMap1.put("ct", "skyrtc");
+        childMap1.put("ac", "answer");
+        childMap1.put("room_id", room_id);
+
+//        map.put("data", childMap2);
+        JSONObject object = new JSONObject(childMap1);
         String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
         mWebSocketClient.send(jsonString);
     }
 
 
-    public void sendOffer(String socketId, String sdp) {
+    public void sendOffer(String socketId, String sdp, String room_id) {
         HashMap<String, Object> childMap1 = new HashMap();
         childMap1.put("type", "offer");
         childMap1.put("sdp", sdp);
 
-        HashMap<String, Object> childMap2 = new HashMap();
-        childMap2.put("socketId", socketId);
-        childMap2.put("sdp", childMap1);
+//        HashMap<String, Object> childMap2 = new HashMap();
+        childMap1.put("socketId", socketId);
+        childMap1.put("room_id", room_id);
+//        childMap1.put("sdp", childMap1);
 
-        HashMap<String, Object> map = new HashMap();
-        map.put("eventName", "__offer");
-        map.put("data", childMap2);
+//        HashMap<String, Object> map = new HashMap();
+//        map.put("eventName", "offer");
+        childMap1.put("ct", "skyrtc");
+        childMap1.put("ac", "offer");
+//        map.put("data", childMap2);
 
-        JSONObject object = new JSONObject(map);
+        JSONObject object = new JSONObject(childMap1);
         String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
         mWebSocketClient.send(jsonString);
 
     }
 
-    public void sendIceCandidate(String socketId, IceCandidate iceCandidate) {
+    public void sendIceCandidate(String socketId, IceCandidate iceCandidate, String room_id) {
         HashMap<String, Object> childMap = new HashMap();
         childMap.put("id", iceCandidate.sdpMid);
         childMap.put("label", iceCandidate.sdpMLineIndex);
         childMap.put("candidate", iceCandidate.sdp);
         childMap.put("socketId", socketId);
-        HashMap<String, Object> map = new HashMap();
-        map.put("eventName", "__ice_candidate");
-        map.put("data", childMap);
-        JSONObject object = new JSONObject(map);
+        childMap.put("room_id", room_id);
+
+//        HashMap<String, Object> map = new HashMap();
+//        map.put("eventName", "ice_candidate");
+        childMap.put("ct", "skyrtc");
+        childMap.put("ac", "ice_candidate");
+//        childMap.put("data", childMap);
+        JSONObject object = new JSONObject(childMap);
         String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
         mWebSocketClient.send(jsonString);
@@ -230,7 +244,7 @@ public class JavaWebSocket implements IWebSocket {
             arr = (JSONArray) data.get("connections");
             String js = JSONObject.toJSONString(arr, SerializerFeature.WriteClassName);
             ArrayList<String> connections = (ArrayList<String>) JSONObject.parseArray(js, String.class);
-            String myId = (String) data.get("you");
+            String myId = (String) data.get("youSocketId");
             events.onJoinToRoom(connections, myId);
         }
 
@@ -278,11 +292,11 @@ public class JavaWebSocket implements IWebSocket {
     // 处理Offer
     private void handleOffer(Map map) {
         Map data = (Map) map.get("data");
-        Map sdpDic;
+//        Map sdpDic;
         if (data != null) {
-            sdpDic = (Map) data.get("sdp");
+//            sdpDic = (Map) data.get("sdp");
             String socketId = (String) data.get("socketId");
-            String sdp = (String) sdpDic.get("sdp");
+            String sdp = (String) data.get("sdp");
             events.onReceiveOffer(socketId, sdp);
         }
 
@@ -291,11 +305,11 @@ public class JavaWebSocket implements IWebSocket {
     // 处理Answer
     private void handleAnswer(Map map) {
         Map data = (Map) map.get("data");
-        Map sdpDic;
+//        Map sdpDic;
         if (data != null) {
-            sdpDic = (Map) data.get("sdp");
+//            sdpDic = (Map) data.get("sdp");
             String socketId = (String) data.get("socketId");
-            String sdp = (String) sdpDic.get("sdp");
+            String sdp = (String) data.get("sdp");
             events.onReceiverAnswer(socketId, sdp);
         }
 

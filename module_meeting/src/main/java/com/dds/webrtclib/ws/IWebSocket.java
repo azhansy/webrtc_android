@@ -21,9 +21,9 @@ public interface IWebSocket {
     //处理回调消息
     void handleMessage(String message);
 
-    void sendIceCandidate(String socketId, IceCandidate iceCandidate);
+    void sendIceCandidate(String socketId, IceCandidate iceCandidate, String room_id);
 
-    void sendAnswer(String socketId, String sdp);
+    void sendAnswer(String socketId, String sdp, String room_id);
 
-    void sendOffer(String socketId, String sdp);
+    void sendOffer(String socketId, String sdp, String room_id);
 }

@@ -36,7 +36,8 @@ public class NodejsActivity extends AppCompatActivity {
     }
 
     private void initVar() {
-        et_signal.setText("wss://webrtcnodeali.aoidc.net:1443");
+//        et_signal.setText("wss://webrtcnodeali.aoidc.net:1443");
+        et_signal.setText("ws://192.168.10.149:9292");
         et_room.setText("232343");
     }
 

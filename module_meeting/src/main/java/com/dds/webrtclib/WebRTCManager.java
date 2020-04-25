@@ -62,7 +62,7 @@ public class WebRTCManager implements ISignalingEvents {
             _roomId = roomId;
             _webSocket = new JavaWebSocket(this);
             _webSocket.connect(_wss);
-            _peerHelper = new PeerConnectionHelper(_webSocket, _iceServers);
+            _peerHelper = new PeerConnectionHelper(_webSocket, _iceServers,_roomId);
         } else {
             // 正在通话中
             _webSocket.close();

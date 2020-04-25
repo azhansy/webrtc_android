@@ -82,7 +82,6 @@ public class PeerConnectionHelper {
     private AudioManager mAudioManager;
 
 
-
     enum Role {Caller, Receiver,}
 
     private Role _role;
@@ -97,11 +96,13 @@ public class PeerConnectionHelper {
     private SurfaceTextureHelper surfaceTextureHelper;
 
     private final ExecutorService executor;
+    private final String _roomId;
 
-    public PeerConnectionHelper(IWebSocket webSocket, MyIceServer[] iceServers) {
+    public PeerConnectionHelper(IWebSocket webSocket, MyIceServer[] iceServers, String roomId) {
         this._connectionPeerDic = new HashMap<>();
         this._connectionIdArray = new ArrayList<>();
         this.ICEServers = new ArrayList<>();
+        this._roomId = roomId;
 
         _webSocket = webSocket;
         executor = Executors.newSingleThreadExecutor();
@@ -519,7 +520,7 @@ public class PeerConnectionHelper {
         @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
             // 发送IceCandidate
-            _webSocket.sendIceCandidate(socketId, iceCandidate);
+            _webSocket.sendIceCandidate(socketId, iceCandidate,_roomId);
         }
 
         @Override
@@ -590,17 +591,17 @@ public class PeerConnectionHelper {
                 //判断连接状态为本地发送offer
                 if (_role == Role.Receiver) {
                     //接收者，发送Answer
-                    _webSocket.sendAnswer(socketId, pc.getLocalDescription().description);
+                    _webSocket.sendAnswer(socketId, pc.getLocalDescription().description, _roomId);
 
                 } else if (_role == Role.Caller) {
                     //发送者,发送自己的offer
-                    _webSocket.sendOffer(socketId, pc.getLocalDescription().description);
+                    _webSocket.sendOffer(socketId, pc.getLocalDescription().description, _roomId);
                 }
 
             } else if (pc.signalingState() == PeerConnection.SignalingState.STABLE) {
                 // Stable 稳定的
                 if (_role == Role.Receiver) {
-                    _webSocket.sendAnswer(socketId, pc.getLocalDescription().description);
+                    _webSocket.sendAnswer(socketId, pc.getLocalDescription().description,_roomId);
 
                 }
             }
