@@ -29,7 +29,6 @@ public class WebRTCManager implements ISignalingEvents {
 
     private IWebSocket _webSocket;
     private PeerConnectionHelper _peerHelper;
-
     private String _roomId;
     private int _mediaType;
     private boolean _videoEnable;
@@ -121,6 +120,7 @@ public class WebRTCManager implements ISignalingEvents {
         handler.post(() -> {
             if (_connectEvent != null) {
                 _connectEvent.onSuccess();
+                _connectEvent = null;
             }
 
         });

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="test_array">
+        <item>wss://webrtcnodeali.aoidc.net:1443/ws?ct=skyrtc</item>
+<!--        <item>wss://testwss.langrensha.game?ct=skyrtc</item>-->
         <item>ws://192.168.10.149:9292?ct=skyrtc</item>
-        <item>wss://testwss.langrensha.game?ct=skyrtc</item>
     </string-array>
 </resources>
