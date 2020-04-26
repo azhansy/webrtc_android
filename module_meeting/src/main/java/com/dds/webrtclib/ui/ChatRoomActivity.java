@@ -184,6 +184,11 @@ public class ChatRoomActivity extends AppCompatActivity implements IViewCallback
         _infos.remove(new MemberBean(userId));
         wr_video_view.removeView(renderer);
 
+        //只有自己就退出
+        if (_infos.size() < 2) {
+            hangUp();
+            return;
+        }
 
         int size = _infos.size();
         for (int i = 0; i < _infos.size(); i++) {
