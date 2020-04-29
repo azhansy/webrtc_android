@@ -169,8 +169,9 @@ public class ChatRoomActivity extends AppCompatActivity implements IViewCallback
 
     private void addView(String id, MediaStream stream) {
         if (_videoViews.containsKey(id)) {
-            SurfaceViewRenderer viewRenderer = _videoViews.get(id);
+            SurfaceViewRenderer renderer = _videoViews.get(id);
             ProxyVideoSink sink = new ProxyVideoSink();
+            sink.setTarget(renderer);
             if (stream.videoTracks.size() > 0) {
                 stream.videoTracks.get(0).addSink(sink);
             }
