@@ -43,10 +43,11 @@ public class JavaWebSocket implements IWebSocket {
     private ISignalingEvents events;
 
     private boolean isOpen; //是否连接成功过
+    private boolean isFirstOpen = true; //是否已经连过一次
 
     private long lastHealth = -1;               // 最后一次心跳时间
     private long heartbeatIdleTime = 30 * 1000;     // 30秒空闲时间
-    private long heartbeatInterval = 10 * 1000;     // 心跳间隔，10秒一次心跳
+    private long heartbeatInterval = 30 * 1000;     // 心跳间隔，10秒一次心跳
     private String heartbeatCMessage = "~H#C~";   // 客户端心跳发送内容
     private String heartbeatSMessage = "~H#S~";   // 服务器心跳发送内容
     private Handler mHandler = new Handler();// 心跳定时器
@@ -109,9 +110,18 @@ public class JavaWebSocket implements IWebSocket {
         mWebSocketClient = new WebSocketClient(uri) {
             @Override
             public void onOpen(ServerHandshake handshake) {
+                lastHealth = System.currentTimeMillis();
                 isOpen = true;
-                events.onWebSocketOpen();
-                Log.e(TAG, "onOpen:" + handshake.getHttpStatus());
+                Log.e(TAG, "isFirstOpen: " + isFirstOpen);
+
+                if (isFirstOpen) {
+                    isFirstOpen = false;
+                    events.onWebSocketOpen();
+                } else {
+                    //重连的;
+                    events.onReconnect();
+                }
+                Log.e(TAG, "onOpen: " + handshake.getHttpStatus());
 
             }
 
@@ -128,15 +138,15 @@ public class JavaWebSocket implements IWebSocket {
             @Override
             public void onClose(int code, String reason, boolean remote) {
                 Log.e(TAG, "onClose:" + reason);
-                if (events != null) {
-//                    events.onWebSocketOpenFailed(reason);
+                if (events != null && isFirstOpen) {
+                    events.onWebSocketOpenFailed(reason);
                 }
             }
 
             @Override
             public void onError(Exception ex) {
                 Log.e(TAG, "onError:" + ex.toString());
-                if (events != null) {
+                if (events != null && isFirstOpen) {
                     events.onWebSocketOpenFailed(ex.toString());
                 }
             }
@@ -149,21 +159,25 @@ public class JavaWebSocket implements IWebSocket {
         public void run() {
             if (lastHealth != -1 && ((System.currentTimeMillis() - lastHealth) > heartbeatIdleTime)) {
 
-                Log.e(TAG, "服务器没有响应.");
+                Log.e(TAG, "服务器没有响应，进入重连");
+                reconnectWs();
 
                 //此时应该触发关闭，然后进入重连
-                if (mWebSocketClient != null) {
-                    mWebSocketClient.close();
-//                //如果client已为空，重新初始化连接
-                    mWebSocketClient = null;
-                }
+//                if (mWebSocketClient != null) {
+//                    mWebSocketClient.close();
+////                //如果client已为空，重新初始化连接
+//                    mWebSocketClient = null;
+//                }
 
-                reconnectWs();
 
             } else {
                 if (mWebSocketClient != null) {
                     if (mWebSocketClient.isClosed()) {
-                        Log.e(TAG, "连接断开! ");
+                        Log.e(TAG, "连接在正常下，已断开， 可能断网了，可能是通话结束! ");
+//                        mHandler.removeMessages(0);
+//                        mWebSocketClient = null;
+                        reconnectWs();
+
                     } else {
                         // 判断发送是否结束
                         Log.d(TAG, "send--> " + heartbeatCMessage);
@@ -182,9 +196,16 @@ public class JavaWebSocket implements IWebSocket {
      * 开启重连
      */
     private void reconnectWs() {
+        //此时应该触发关闭，然后进入重连
+        if (mWebSocketClient != null) {
+            mWebSocketClient.close();
+//                //如果client已为空，重新初始化连接
+            mWebSocketClient = null;
+        }
+
         mHandler.removeCallbacks(heartBeatRunnable);
         mHandler.postDelayed(() -> {
-            Log.e(TAG, "开启重连======="+wss);
+            Log.e(TAG, "开启重连=======" + wss);
             connect(wss);
         }, reconnectTime);
     }

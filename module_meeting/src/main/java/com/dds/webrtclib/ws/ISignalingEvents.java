@@ -34,4 +34,6 @@ public interface ISignalingEvents {
 
     void onReceiverAnswer(String socketId, String sdp);
 
+    void onReconnect();
+
 }

@@ -180,6 +180,13 @@ public class ChatSingleActivity extends AppCompatActivity {
                 });
 
             }
+
+            @Override
+            public void reconnectRoom() {
+                runOnUiThread(() ->{
+                    manager.joinRoom(getApplicationContext(), rootEglBase);
+                });
+            }
         });
         if (!PermissionUtil.isNeedRequestPermission(ChatSingleActivity.this)) {
             manager.joinRoom(getApplicationContext(), rootEglBase);

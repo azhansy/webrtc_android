@@ -14,4 +14,6 @@ public interface IViewCallback {
 
     void onCloseWithId(String socketId);
 
+    void reconnectRoom();
+
 }

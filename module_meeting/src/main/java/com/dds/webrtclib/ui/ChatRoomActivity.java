@@ -133,6 +133,13 @@ public class ChatRoomActivity extends AppCompatActivity implements IViewCallback
 
     }
 
+    @Override
+    public void reconnectRoom() {
+        runOnUiThread(() ->{
+            manager.joinRoom(getApplicationContext(), rootEglBase);
+        });
+
+    }
 
     private void addView(String id, MediaStream stream) {
         SurfaceViewRenderer renderer = new SurfaceViewRenderer(ChatRoomActivity.this);

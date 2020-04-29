@@ -61,7 +61,7 @@ public class WebRTCManager implements ISignalingEvents {
             _roomId = roomId;
             _webSocket = new JavaWebSocket(this);
             _webSocket.connect(_wss);
-            _peerHelper = new PeerConnectionHelper(_webSocket, _iceServers,_roomId);
+            _peerHelper = new PeerConnectionHelper(_webSocket, _iceServers, _roomId);
         } else {
             // 正在通话中
             _webSocket.close();
@@ -69,6 +69,15 @@ public class WebRTCManager implements ISignalingEvents {
             _peerHelper = null;
         }
 
+    }
+
+    public void reconnect() {
+        if (_webSocket != null) {
+            _webSocket.close();
+            _webSocket = null;
+            _peerHelper = null;
+        }
+        connect(_mediaType, _roomId);
     }
 
 
@@ -120,7 +129,6 @@ public class WebRTCManager implements ISignalingEvents {
         handler.post(() -> {
             if (_connectEvent != null) {
                 _connectEvent.onSuccess();
-                _connectEvent = null;
             }
 
         });
@@ -215,5 +223,8 @@ public class WebRTCManager implements ISignalingEvents {
 
     }
 
-
+    @Override
+    public void onReconnect() {
+        handler.post(this::reconnect);
+    }
 }
