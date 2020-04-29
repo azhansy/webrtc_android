@@ -53,6 +53,7 @@ public class ChatRoomActivity extends AppCompatActivity implements IViewCallback
     private int mScreenWidth;
 
     private EglBase rootEglBase;
+    private String userId;
 
     public static void openActivity(Activity activity) {
         Intent intent = new Intent(activity, ChatRoomActivity.class);
@@ -105,13 +106,27 @@ public class ChatRoomActivity extends AppCompatActivity implements IViewCallback
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        manager.joinRoom(getApplicationContext(), rootEglBase);
+        manager.setCallback(this);
+
+        _videoViews.remove(userId);
+        _sinks.remove(userId);
+        _infos.remove(0);
+    }
+
+    @Override
     public void onSetLocalStream(MediaStream stream, String userId) {
+        this.userId = userId;
         List<VideoTrack> videoTracks = stream.videoTracks;
         if (videoTracks.size() > 0) {
             _localVideoTrack = videoTracks.get(0);
         }
         runOnUiThread(() -> {
-            addView(userId, stream);
+            if (wr_video_view.getChildCount() > 0)
+                updateLocalView(userId, stream);
+            else addView(userId, stream);
         });
     }
 
@@ -140,8 +155,29 @@ public class ChatRoomActivity extends AppCompatActivity implements IViewCallback
         });
 
     }
+    private void updateLocalView(String id, MediaStream stream) {
+        SurfaceViewRenderer renderer = (SurfaceViewRenderer) wr_video_view.getChildAt(0);
+        ProxyVideoSink sink = new ProxyVideoSink();
+        sink.setTarget(renderer);
+        if (stream.videoTracks.size() > 0) {
+            stream.videoTracks.get(0).addSink(sink);
+        }
+        _videoViews.put(id, renderer);
+        _sinks.put(id, sink);
+        _infos.add(new MemberBean(id));
+    }
 
     private void addView(String id, MediaStream stream) {
+        if (_videoViews.containsKey(id)) {
+            SurfaceViewRenderer viewRenderer = _videoViews.get(id);
+            ProxyVideoSink sink = new ProxyVideoSink();
+            if (stream.videoTracks.size() > 0) {
+                stream.videoTracks.get(0).addSink(sink);
+            }
+            _sinks.put(id, sink);
+            return;
+        }
+
         SurfaceViewRenderer renderer = new SurfaceViewRenderer(ChatRoomActivity.this);
         renderer.init(rootEglBase.getEglBaseContext(), null);
         renderer.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dds.webrtclib.R;
+import com.dds.webrtclib.WebRTCManager;
 import com.dds.webrtclib.utils.Utils;
 
 /**
@@ -27,6 +28,7 @@ public class ChatRoomFragment extends Fragment {
     private TextView wr_switch_camera;
     private TextView wr_hand_free;
     private TextView wr_open_camera;
+    private TextView ice_restart;
     private ChatRoomActivity activity;
 
     private boolean enableMic = true;
@@ -60,6 +62,7 @@ public class ChatRoomFragment extends Fragment {
         wr_switch_camera = rootView.findViewById(R.id.wr_switch_camera);
         wr_hand_free = rootView.findViewById(R.id.wr_hand_free);
         wr_open_camera = rootView.findViewById(R.id.wr_open_camera);
+        ice_restart = rootView.findViewById(R.id.ice_restart);
     }
 
     private void initListener() {
@@ -80,6 +83,10 @@ public class ChatRoomFragment extends Fragment {
             enableCamera = !enableCamera;
             toggleOpenCamera(enableCamera);
             activity.toggleCamera(enableCamera);
+        });
+
+        ice_restart.setOnClickListener(v->{
+            WebRTCManager.getInstance().reconnect();
         });
     }
 
