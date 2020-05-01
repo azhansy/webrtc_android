@@ -5,13 +5,19 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ess.filepicker.util.FileUtils;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +74,17 @@ public class DWebSocket extends WebSocketClient {
         handleMessage(message);
     }
 
+    @Override
+    public void onMessage(ByteBuffer bytes) {
+        Log.d(TAG, "接收到buffer的文件: "+bytes.toString());
+        try {
+            FileChannel fc = new FileOutputStream("data.txt").getChannel();
+            fc.write(bytes);
+            fc.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void setConnectFlag(boolean flag) {
         connectFlag = flag;
@@ -482,6 +499,12 @@ public class DWebSocket extends WebSocketClient {
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
         send(jsonString);
+    }
+
+    public void sendFile(String path) {
+        byte[] bytes = FileUtils.readBytes(path);
+        Log.d(TAG, "send--> " + Arrays.toString(bytes));
+        send(bytes);
     }
 
     // 忽略证书

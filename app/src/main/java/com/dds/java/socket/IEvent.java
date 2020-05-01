@@ -44,4 +44,6 @@ public interface IEvent {
 
     void reConnect();
 
+    void onSendFile(String filePath);
+
 }

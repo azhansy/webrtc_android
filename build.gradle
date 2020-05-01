@@ -4,11 +4,12 @@ buildscript {
         mavenCentral()
         jcenter()
         google()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-
-        }
+        maven { url "https://jitpack.io" }
+//        maven {
+//            url 'https://maven.google.com/'
+//            name 'Google'
+//
+//        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
@@ -24,10 +25,11 @@ allprojects {
         mavenCentral()
         jcenter()
         google()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        maven { url "https://jitpack.io" }
+//        maven {
+//            url 'https://maven.google.com/'
+//            name 'Google'
+//        }
     }
 }
 

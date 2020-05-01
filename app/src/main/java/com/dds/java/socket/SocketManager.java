@@ -335,6 +335,16 @@ public class SocketManager implements IEvent {
             webSocket.reconnect();
         });
     }
+
+    @Override
+    public void onSendFile(String filePath) {
+        handler.post(() -> {
+            if (webSocket != null) {
+                webSocket.sendFile(filePath);
+            }
+        });
+    }
+
     //===========================================================================================
 
 

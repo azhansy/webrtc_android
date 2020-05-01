@@ -101,4 +101,16 @@
         android:onClick="callVideo"
         android:text="拨打视频电话"
         android:textAllCaps="false" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:onClick="chooseFile"
+        android:text="选择文件"
+        android:textAllCaps="false" />
+    <TextView
+        android:id="@+id/tv_filepath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

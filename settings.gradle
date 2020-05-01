@@ -1,1 +1,4 @@
-include ':app', ':libwebrtc', ':module_p2pchat'
+include ':app',
+        ':libwebrtc',
+        ':module_p2pchat',
+        ':filepicker'
