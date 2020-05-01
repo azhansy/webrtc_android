@@ -268,14 +268,15 @@ public class DWebSocket extends WebSocketClient {
      */
     public void createRoom(String room, int roomSize, String myId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__create");
+//        map.put("eventName", "__create");
+        map.put("ct", "skyrtc");
+        map.put("ac", "create");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("room", room);
+        map.put("roomSize", roomSize);
+        map.put("userID", myId);
 
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("room", room);
-        childMap.put("roomSize", roomSize);
-        childMap.put("userID", myId);
-
-        map.put("data", childMap);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -285,15 +286,16 @@ public class DWebSocket extends WebSocketClient {
     // 发送邀请
     public void sendInvite(String room, String myId, String users, boolean audioOnly) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__invite");
+//        map.put("eventName", "__invite");
+        map.put("ct", "skyrtc");
+        map.put("ac", "invite");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("room", room);
+        map.put("audioOnly", audioOnly);
+        map.put("inviteID", myId);
+        map.put("userList", users);
 
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("room", room);
-        childMap.put("audioOnly", audioOnly);
-        childMap.put("inviteID", myId);
-        childMap.put("userList", users);
-
-        map.put("data", childMap);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -307,14 +309,15 @@ public class DWebSocket extends WebSocketClient {
     // 取消邀请
     public void sendCancel(String useId, String userList) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__cancel");
+//        map.put("eventName", "__cancel");
+        map.put("ct", "skyrtc");
+        map.put("ac", "cancel");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("inviteID", useId);
+        map.put("userList", userList);
 
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("inviteID", useId);
-        childMap.put("userList", userList);
 
-
-        map.put("data", childMap);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -324,14 +327,15 @@ public class DWebSocket extends WebSocketClient {
     // 发送响铃通知
     public void sendRing(String myId, String toId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__ring");
+//        map.put("eventName", "__ring");
+        map.put("ct", "skyrtc");
+        map.put("ac", "ring");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("fromID", myId);
+        map.put("toID", toId);
 
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("fromID", myId);
-        childMap.put("toID", toId);
 
-
-        map.put("data", childMap);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -341,11 +345,13 @@ public class DWebSocket extends WebSocketClient {
     //加入房间
     public void sendJoin(String room, String myId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__join");
-        Map<String, String> childMap = new HashMap<>();
-        childMap.put("room", room);
-        childMap.put("userID", myId);
-        map.put("data", childMap);
+//        map.put("eventName", "__join");
+        map.put("ct", "skyrtc");
+        map.put("ac", "join");
+//        Map<String, String> childMap = new HashMap<>();
+        map.put("room", room);
+        map.put("userID", myId);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -355,14 +361,15 @@ public class DWebSocket extends WebSocketClient {
     // 拒接接听
     public void sendRefuse(String inviteID, String myId, int refuseType) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__reject");
+//        map.put("eventName", "__reject");
+        map.put("ct", "skyrtc");
+        map.put("ac", "reject");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("toID", inviteID);
+        map.put("fromID", myId);
+        map.put("refuseType", String.valueOf(refuseType));
 
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("toID", inviteID);
-        childMap.put("fromID", myId);
-        childMap.put("refuseType", String.valueOf(refuseType));
-
-        map.put("data", childMap);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -372,14 +379,15 @@ public class DWebSocket extends WebSocketClient {
     // 离开房间
     public void sendLeave(String myId, String room, String userId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__leave");
+//        map.put("eventName", "__leave");
+        map.put("ct", "skyrtc");
+        map.put("ac", "leave");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("room", room);
+        map.put("fromID", myId);
+        map.put("userID", userId);
 
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("room", room);
-        childMap.put("fromID", myId);
-        childMap.put("userID", userId);
-
-        map.put("data", childMap);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -391,12 +399,14 @@ public class DWebSocket extends WebSocketClient {
     // send offer
     public void sendOffer(String myId, String userId, String sdp) {
         Map<String, Object> map = new HashMap<>();
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("sdp", sdp);
-        childMap.put("userID", userId);
-        childMap.put("fromID", myId);
-        map.put("data", childMap);
-        map.put("eventName", "__offer");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("sdp", sdp);
+        map.put("userID", userId);
+        map.put("fromID", myId);
+//        map.put("data", childMap);
+//        map.put("eventName", "__offer");
+        map.put("ct", "skyrtc");
+        map.put("ac", "offer");
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -406,12 +416,14 @@ public class DWebSocket extends WebSocketClient {
     // send answer
     public void sendAnswer(String myId, String userId, String sdp) {
         Map<String, Object> map = new HashMap<>();
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("sdp", sdp);
-        childMap.put("fromID", myId);
-        childMap.put("userID", userId);
-        map.put("data", childMap);
-        map.put("eventName", "__answer");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("sdp", sdp);
+        map.put("fromID", myId);
+        map.put("userID", userId);
+//        map.put("data", childMap);
+//        map.put("eventName", "__answer");
+        map.put("ct", "skyrtc");
+        map.put("ac", "answer");
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -421,15 +433,16 @@ public class DWebSocket extends WebSocketClient {
     // send ice-candidate
     public void sendIceCandidate(String userId, String id, int label, String candidate) {
         Map<String, Object> map = new HashMap<>();
-        map.put("eventName", "__ice_candidate");
+//        map.put("eventName", "__ice_candidate");
+        map.put("ct", "skyrtc");
+        map.put("ac", "ice_candidate");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("userID", userId);
+        map.put("id", id);
+        map.put("label", label);
+        map.put("candidate", candidate);
 
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("userID", userId);
-        childMap.put("id", id);
-        childMap.put("label", label);
-        childMap.put("candidate", candidate);
-
-        map.put("data", childMap);
+//        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -441,11 +454,14 @@ public class DWebSocket extends WebSocketClient {
     // 切换到语音
     public void sendTransAudio(String myId, String userId) {
         Map<String, Object> map = new HashMap<>();
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("fromID", myId);
-        childMap.put("userID", userId);
-        map.put("data", childMap);
-        map.put("eventName", "__audio");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("fromID", myId);
+        map.put("userID", userId);
+//        map.put("data", childMap);
+//        map.put("eventName", "__audio");
+
+        map.put("ct", "skyrtc");
+        map.put("ac", "audio");
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -455,11 +471,13 @@ public class DWebSocket extends WebSocketClient {
     // 断开重连
     public void sendDisconnect(String myId, String userId) {
         Map<String, Object> map = new HashMap<>();
-        Map<String, Object> childMap = new HashMap<>();
-        childMap.put("fromID", myId);
-        childMap.put("userID", userId);
-        map.put("data", childMap);
-        map.put("eventName", "__disconnect");
+//        Map<String, Object> childMap = new HashMap<>();
+        map.put("fromID", myId);
+        map.put("userID", userId);
+//        map.put("data", childMap);
+        map.put("ct", "skyrtc");
+        map.put("ac", "audio");
+//        map.put("eventName", "__disconnect");
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
