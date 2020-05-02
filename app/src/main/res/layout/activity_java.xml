@@ -8,11 +8,18 @@
     tools:context="com.dds.java.JavaActivity">
 
 
-    <EditText
+    <!--<EditText
         android:id="@+id/et_wss"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="例如：ws://192.168.1.138:3000/ws" />
+        android:hint="例如：ws://192.168.1.138:3000/ws" />-->
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:entries="@array/test_array"
+        android:padding="10dp" />
 
     <EditText
         android:id="@+id/et_name"

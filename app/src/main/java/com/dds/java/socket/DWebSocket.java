@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ess.filepicker.util.FileUtils;
 
 import org.java_websocket.client.WebSocketClient;
@@ -17,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +79,7 @@ public class DWebSocket extends WebSocketClient {
 
     @Override
     public void onMessage(ByteBuffer bytes) {
-        Log.d(TAG, "接收到buffer的文件: "+bytes.toString());
+        Log.d(TAG, "接收到buffer的文件: " + bytes.toString());
         try {
             FileChannel fc = new FileOutputStream("data.txt").getChannel();
             fc.write(bytes);
@@ -98,64 +101,64 @@ public class DWebSocket extends WebSocketClient {
         String eventName = (String) map.get("eventName");
         if (eventName == null) return;
         // 登录成功
-        if (eventName.equals("__login_success")) {
+        if (eventName.equals("_login_success")) {
             handleLogin(map);
             return;
         }
         // 被邀请
-        if (eventName.equals("__invite")) {
+        if (eventName.equals("_invite")) {
             handleInvite(map);
             return;
         }
         // 取消拨出
-        if (eventName.equals("__cancel")) {
+        if (eventName.equals("_cancel")) {
             handleCancel(map);
             return;
         }
         // 响铃
-        if (eventName.equals("__ring")) {
+        if (eventName.equals("_ring")) {
             handleRing(map);
             return;
         }
         // 进入房间
-        if (eventName.equals("__peers")) {
+        if (eventName.equals("_peers")) {
             handlePeers(map);
             return;
         }
         // 新人入房间
-        if (eventName.equals("__new_peer")) {
+        if (eventName.equals("_new_peer")) {
             handleNewPeer(map);
             return;
         }
         // 拒绝接听
-        if (eventName.equals("__reject")) {
+        if (eventName.equals("_reject")) {
             handleReject(map);
             return;
         }
         // offer
-        if (eventName.equals("__offer")) {
+        if (eventName.equals("_offer")) {
             handleOffer(map);
             return;
         }
         // answer
-        if (eventName.equals("__answer")) {
+        if (eventName.equals("_answer")) {
             handleAnswer(map);
             return;
         }
         // ice-candidate
-        if (eventName.equals("__ice_candidate")) {
+        if (eventName.equals("_ice_candidate")) {
             handleIceCandidate(map);
         }
         // 离开房间
-        if (eventName.equals("__leave")) {
+        if (eventName.equals("_leave")) {
             handleLeave(map);
         }
         // 切换到语音
-        if (eventName.equals("__audio")) {
+        if (eventName.equals("_audio")) {
             handleTransAudio(map);
         }
         // 意外断开
-        if (eventName.equals("__disconnect")) {
+        if (eventName.equals("_disconnect")) {
             handleDisConnect(map);
         }
 
@@ -221,17 +224,22 @@ public class DWebSocket extends WebSocketClient {
     private void handleReject(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String fromID = (String) data.get("fromID");
+            String socket_id = (String) data.get("socket_id");
             int rejectType = Integer.parseInt(String.valueOf(data.get("refuseType")));
-            this.iEvent.onReject(fromID, rejectType);
+            this.iEvent.onReject(socket_id, rejectType);
         }
     }
 
     private void handlePeers(Map map) {
         Map data = (Map) map.get("data");
+        JSONArray arr;
+
         if (data != null) {
-            String userID = (String) data.get("userID");
-            String connections = (String) data.get("connections");
+            String userID = (String) data.get("you");
+            arr = (JSONArray) data.get("connections");
+            String js = JSONObject.toJSONString(arr, SerializerFeature.WriteClassName);
+            ArrayList<String> connections = (ArrayList<String>) JSONObject.parseArray(js, String.class);
+
             this.iEvent.onPeers(userID, connections);
         }
     }
@@ -247,7 +255,7 @@ public class DWebSocket extends WebSocketClient {
     private void handleRing(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String fromId = (String) data.get("fromID");
+            String fromId = (String) data.get("from_id");
             this.iEvent.onRing(fromId);
         }
     }
@@ -255,9 +263,9 @@ public class DWebSocket extends WebSocketClient {
     private void handleCancel(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String inviteID = (String) data.get("inviteID");
-            String userList = (String) data.get("userList");
-            this.iEvent.onCancel(inviteID);
+            String socket_id = (String) data.get("socket_id");
+//            String userList = (String) data.get("userList");
+            this.iEvent.onCancel(socket_id);
         }
     }
 
@@ -265,10 +273,10 @@ public class DWebSocket extends WebSocketClient {
         Map data = (Map) map.get("data");
         if (data != null) {
             String room = (String) data.get("room");
-            boolean audioOnly = (boolean) data.get("audioOnly");
+            int audioOnly = (int) data.get("audio_only");
             String inviteID = (String) data.get("inviteID");
             String userList = (String) data.get("userList");
-            this.iEvent.onInvite(room, audioOnly, inviteID, userList);
+            this.iEvent.onInvite(room, audioOnly == 1, inviteID, userList);
         }
     }
 
@@ -287,11 +295,11 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        map.put("eventName", "__create");
         map.put("ct", "skyrtc");
-        map.put("ac", "create");
+        map.put("ac", "join_room");
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("room", room);
-        map.put("roomSize", roomSize);
-        map.put("userID", myId);
+//        map.put("roomSize", roomSize);
+//        map.put("userID", myId);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -308,9 +316,9 @@ public class DWebSocket extends WebSocketClient {
         map.put("ac", "invite");
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("room", room);
-        map.put("audioOnly", audioOnly);
-        map.put("inviteID", myId);
-        map.put("userList", users);
+        map.put("audio_only", audioOnly ? 1 : 0);
+//        map.put("inviteID", myId);
+//        map.put("userList", users);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -330,8 +338,8 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "cancel");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("inviteID", useId);
-        map.put("userList", userList);
+//        map.put("inviteID", useId);
+//        map.put("userList", userList);
 
 
 //        map.put("data", childMap);

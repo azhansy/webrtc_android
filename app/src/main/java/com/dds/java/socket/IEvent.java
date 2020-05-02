@@ -1,5 +1,7 @@
 package com.dds.java.socket;
 
+import java.util.ArrayList;
+
 /**
  * Created by dds on 2019/7/26.
  * android_shuai@163.com
@@ -19,7 +21,7 @@ public interface IEvent {
     void onRing(String userId);
 
 
-    void onPeers(String myId, String userList);
+    void onPeers(String myId, ArrayList<String> userList);
 
     void onNewPeer(String myId);
 

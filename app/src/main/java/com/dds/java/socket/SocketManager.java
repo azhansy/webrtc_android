@@ -16,6 +16,7 @@ import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -49,9 +50,12 @@ public class SocketManager implements IEvent {
 
     public void connect(String url, String userId, int device) {
         if (webSocket == null || !webSocket.isOpen()) {
+            myId = userId;
             URI uri;
             try {
                 String urls = url + "/" + userId + "/" + device;
+                Log.i(TAG, "urls=" + urls);
+
                 uri = new URI(urls);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
@@ -97,7 +101,8 @@ public class SocketManager implements IEvent {
     @Override
     public void onOpen() {
         Log.i(TAG, "socket is open!");
-
+        //没有返回，我们自己调用一下
+        loginSuccess(myId, "");
     }
 
     @Override
@@ -223,7 +228,7 @@ public class SocketManager implements IEvent {
     }
 
     @Override  // 加入房间
-    public void onPeers(String myId, String userId) {
+    public void onPeers(String myId, ArrayList<String> userId) {
         handler.post(() -> {
             //自己进入了房间，然后开始发送offer
             CallSession currentSession = SkyEngineKit.Instance().getCurrentSession();

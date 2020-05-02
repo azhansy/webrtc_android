@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,8 +36,9 @@ import java.util.List;
  */
 public class JavaActivity extends AppCompatActivity implements IUserState {
 
-    private EditText wss;
+//    private EditText wss;
     private EditText et_name;
+    Spinner spinner;
     private TextView user_state;
     private TextView tv_filepath;
     public static int FILE_REQUSET_CODE = 156;
@@ -59,7 +61,9 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
 
 
     private void initView() {
-        wss = findViewById(R.id.et_wss);
+//        wss = findViewById(R.id.et_wss);
+        spinner = findViewById(R.id.spinner);
+
         et_name = findViewById(R.id.et_name);
         user_state = findViewById(R.id.user_state);
         tv_filepath = findViewById(R.id.tv_filepath);
@@ -75,7 +79,7 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
     }
 
     private void initData() {
-        wss.setText("wss://webrtcnodeali.aoidc.net:1443/ws");
+//        wss.setText("wss://webrtcnodeali.aoidc.net:1443/ws?ct=skyrtc");
 //        wss.setText("ws://192.168.1.138:5000/ws");
         SocketManager.getInstance().addUserStateCallback(this);
         int userState = SocketManager.getInstance().getUserState();
@@ -91,7 +95,7 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
     // 登录
     public void connect(View view) {
         SocketManager.getInstance().connect(
-                wss.getText().toString().trim(),
+                spinner.getSelectedItem().toString().trim(),
                 et_name.getText().toString().trim(),
                 device);
 

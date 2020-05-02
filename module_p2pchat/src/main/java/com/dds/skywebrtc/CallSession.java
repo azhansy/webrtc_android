@@ -317,17 +317,17 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     //------------------------------------receive---------------------------------------------------
 
     // 加入房间成功
-    public void onJoinHome(String myId, String users) {
+    public void onJoinHome(String myId, ArrayList<String> users) {
         startTime = 0;
         audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         networkMonitor.addObserver(this);
         executor.execute(() -> {
             mMyId = myId;
             // todo 多人会议
-            if (!TextUtils.isEmpty(users)) {
-                String[] split = users.split(",");
-                List<String> strings = Arrays.asList(split);
-                mTargetId = strings.get(0);
+            if (!users.isEmpty()) {
+//                String[] split = users.split(",");
+//                List<String> strings = Arrays.asList(split);
+                mTargetId = users.get(0);
             }
             if (_factory == null) {
                 _factory = createConnectionFactory();
