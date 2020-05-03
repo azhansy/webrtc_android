@@ -148,18 +148,28 @@ public class DWebSocket extends WebSocketClient {
         // ice-candidate
         if (eventName.equals("_ice_candidate")) {
             handleIceCandidate(map);
+            return;
+
         }
         // 离开房间
-        if (eventName.equals("_leave")) {
+//        if (eventName.equals("_leave_room")) {
+//            handleLeave(map);
+//        }
+        if (eventName.equals("_remove_peer")) {
             handleLeave(map);
+            return;
+
         }
         // 切换到语音
         if (eventName.equals("_audio")) {
             handleTransAudio(map);
+            return;
+
         }
         // 意外断开
         if (eventName.equals("_disconnect")) {
             handleDisConnect(map);
+            return;
         }
 
 
@@ -283,7 +293,7 @@ public class DWebSocket extends WebSocketClient {
     private void handleLeave(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String from_uid = (String) data.get("from_uid");
+            String from_uid = (String) data.get("socket_id");
             this.iEvent.onLeave(from_uid);
         }
     }
@@ -406,7 +416,7 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        map.put("eventName", "__leave");
         map.put("ct", "skyrtc");
-        map.put("ac", "leave");
+        map.put("ac", "leave_room");
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("room_id", room);
         map.put("from_uid", myId);
