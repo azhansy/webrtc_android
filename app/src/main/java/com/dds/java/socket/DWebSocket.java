@@ -437,7 +437,6 @@ public class DWebSocket extends WebSocketClient {
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("sdp", sdp);
         map.put("user_id", userId);
-        map.put("user_id", myId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__offer");
         map.put("ct", "skyrtc");
