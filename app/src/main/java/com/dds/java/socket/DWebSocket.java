@@ -43,7 +43,7 @@ public class DWebSocket extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        Log.e("dds_error", "onClose:" + reason + "remote:" + remote);
+        Log.e("dds_error", "onClose:" + reason + "remote:" + remote+",connectFlag:"+connectFlag);
         if (connectFlag) {
             try {
                 Thread.sleep(3000);
@@ -510,12 +510,13 @@ public class DWebSocket extends WebSocketClient {
         map.put("to_user", userId);
 //        map.put("data", childMap);
         map.put("ct", "skyrtc");
-        map.put("ac", "trans_audio");
-//        map.put("eventName", "__disconnect");
+        map.put("ac", "disconnect");
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
-        Log.d(TAG, "send-->" + jsonString);
-        send(jsonString);
+        Log.d(TAG, "isOpen()=" + isOpen() + ",send-->" + jsonString);
+        if (isOpen()) {
+            send(jsonString);
+        }
     }
 
     public void sendFile(String path) {

@@ -113,6 +113,9 @@ public class SocketManager implements IEvent {
         if (iUserState != null && iUserState.get() != null) {
             iUserState.get().userLogin();
         }
+        if (webSocket != null) {
+            Log.i(TAG, "重连 试试:" + userId);
+        }
     }
 
 

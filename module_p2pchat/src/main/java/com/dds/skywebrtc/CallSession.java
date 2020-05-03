@@ -3,7 +3,6 @@ package com.dds.skywebrtc;
 import android.app.Application;
 import android.content.Context;
 import android.media.AudioManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.dds.skywebrtc.render.ProxyVideoSink;
@@ -37,8 +36,6 @@ import org.webrtc.audio.JavaAudioDeviceModule;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -162,6 +159,18 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
         });
 
     }
+
+
+    // 断开重连
+    public void sendDisConnect() {
+        executor.execute(() -> {
+            if (avEngineKit.mEvent != null) {
+                // 取消拨出
+                avEngineKit.mEvent.sendDisConnect(mTargetId);
+            }
+        });
+    }
+
 
     // 离开房间
     public void leave() {
@@ -415,6 +424,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     public void onRefuse(String userId) {
         release();
     }
+
     public void onCancel(String userId) {
         // 关闭响铃
         if (avEngineKit.mEvent != null) {
@@ -489,6 +499,12 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     @Override
     public void onConnectionTypeChanged(NetworkMonitorAutoDetect.ConnectionType connectionType) {
         Log.e(TAG, "onConnectionTypeChanged" + connectionType.toString());
+//        if (
+//                connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_WIFI ||
+//                        connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_4G ||
+//                        connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_3G ||
+//                        connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_2G) {
+//        }
     }
     // --------------------------------界面显示相关-------------------------------------------------
 
