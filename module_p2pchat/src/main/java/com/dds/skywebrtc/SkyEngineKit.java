@@ -37,11 +37,11 @@ public class SkyEngineKit {
             avEngineKit.mEvent = iSocketEvent;
 
             // 初始化一些stun和turn的地址
-            PeerConnection.IceServer var12 = PeerConnection.IceServer.builder("coturn.aoidc.net:3478?transport=udp")
+            PeerConnection.IceServer var12 = PeerConnection.IceServer.builder("stun:coturn.aoidc.net:3478?transport=udp")
                     .setUsername("kaka")
                     .setPassword("kaka#kaka")
                     .createIceServer();
-            PeerConnection.IceServer var13 = PeerConnection.IceServer.builder("coturn.aoidc.net:5349?transport=tcp")
+            PeerConnection.IceServer var13 = PeerConnection.IceServer.builder("stun:coturn.aoidc.net:5349?transport=tcp")
                     .setUsername("kaka")
                     .setPassword("kaka#kaka")
                     .createIceServer();
