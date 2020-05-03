@@ -247,7 +247,7 @@ public class DWebSocket extends WebSocketClient {
     private void handleNewPeer(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String user_uid = (String) data.get("user_uid");
+            String user_uid = (String) data.get("socket_id");
             this.iEvent.onNewPeer(user_uid);
         }
     }
@@ -263,9 +263,9 @@ public class DWebSocket extends WebSocketClient {
     private void handleCancel(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String socket_id = (String) data.get("socket_id");
-//            String userList = (String) data.get("userList");
-            this.iEvent.onCancel(socket_id);
+            String from_uid = (String) data.get("from_uid");
+            String to_uid = (String) data.get("to_uid");
+            this.iEvent.onCancel(from_uid);
         }
     }
 
@@ -338,8 +338,8 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "cancel");
 //        Map<String, Object> childMap = new HashMap<>();
-//        map.put("inviteID", useId);
-//        map.put("userList", userList);
+        map.put("from_uid", useId);
+        map.put("to_uid", userList);
 
 
 //        map.put("data", childMap);

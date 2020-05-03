@@ -415,6 +415,13 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     public void onRefuse(String userId) {
         release();
     }
+    public void onCancel(String userId) {
+        // 关闭响铃
+        if (avEngineKit.mEvent != null) {
+            avEngineKit.mEvent.shouldStopRing();
+        }
+        release();
+    }
 
     // 对方已响铃
     public void onRingBack(String userId) {

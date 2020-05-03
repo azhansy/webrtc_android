@@ -212,8 +212,13 @@ public class SocketManager implements IEvent {
     }
 
     @Override
-    public void onCancel(String inviteId) {
-
+    public void onCancel(String fromId) {
+        handler.post(() -> {
+            CallSession currentSession = SkyEngineKit.Instance().getCurrentSession();
+            if (currentSession != null) {
+                currentSession.onCancel(fromId);
+            }
+        });
     }
 
     @Override
