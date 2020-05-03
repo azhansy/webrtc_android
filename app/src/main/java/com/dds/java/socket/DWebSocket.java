@@ -273,9 +273,9 @@ public class DWebSocket extends WebSocketClient {
     private void handleCancel(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String from_uid = (String) data.get("from_uid");
-            String to_uid = (String) data.get("to_uid");
-            this.iEvent.onCancel(from_uid);
+            String user_id = (String) data.get("user_id");
+            String to_user = (String) data.get("to_user");
+            this.iEvent.onCancel(user_id);
         }
     }
 
@@ -284,9 +284,9 @@ public class DWebSocket extends WebSocketClient {
         if (data != null) {
             String room = (String) data.get("room_id");
             int audioOnly = (int) data.get("audio_only");
-            String from_uid = (String) data.get("from_uid");
-            String to_uid = (String) data.get("to_uid");
-            this.iEvent.onInvite(room, audioOnly == 1, from_uid, to_uid);
+            String user_id = (String) data.get("user_id");
+            String to_user = (String) data.get("to_user");
+            this.iEvent.onInvite(room, audioOnly == 1, user_id, to_user);
         }
     }
 
@@ -327,8 +327,8 @@ public class DWebSocket extends WebSocketClient {
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("room_id", room);
         map.put("audio_only", audioOnly ? 1 : 0);
-        map.put("from_uid", myId);
-        map.put("to_uid", users);
+        map.put("user_id", myId);
+        map.put("to_user", users);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -348,8 +348,8 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "cancel");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("from_uid", useId);
-        map.put("to_uid", userList);
+        map.put("user_id", useId);
+        map.put("to_user", userList);
 
 
 //        map.put("data", childMap);
@@ -360,14 +360,14 @@ public class DWebSocket extends WebSocketClient {
     }
 
     // 发送响铃通知
-    public void sendRing(String from_uid, String to_uid) {
+    public void sendRing(String user_id, String to_user) {
         Map<String, Object> map = new HashMap<>();
 //        map.put("eventName", "__ring");
         map.put("ct", "skyrtc");
         map.put("ac", "ring");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("from_uid", from_uid);
-        map.put("to_uid", to_uid);
+        map.put("user_id", user_id);
+        map.put("to_user", to_user);
 
 
 //        map.put("data", childMap);
@@ -400,8 +400,8 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "reject");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("to_uid", inviteID);
-        map.put("from_uid", myId);
+        map.put("to_user", inviteID);
+        map.put("user_id", myId);
         map.put("refuse_type", String.valueOf(refuse_type));
 
 //        map.put("data", childMap);
@@ -419,8 +419,8 @@ public class DWebSocket extends WebSocketClient {
         map.put("ac", "leave_room");
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("room_id", room);
-        map.put("from_uid", myId);
-        map.put("to_uid", userId);
+        map.put("user_id", myId);
+        map.put("to_user", userId);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -437,7 +437,7 @@ public class DWebSocket extends WebSocketClient {
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("sdp", sdp);
         map.put("user_id", userId);
-        map.put("from_uid", myId);
+        map.put("user_id", myId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__offer");
         map.put("ct", "skyrtc");
@@ -453,7 +453,7 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("sdp", sdp);
-        map.put("from_uid", myId);
+        map.put("user_id", myId);
         map.put("user_id", userId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__answer");
@@ -490,7 +490,7 @@ public class DWebSocket extends WebSocketClient {
     public void sendTransAudio(String myId, String userId) {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("from_uid", myId);
+        map.put("user_id", myId);
         map.put("user_id", userId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__audio");
@@ -507,7 +507,7 @@ public class DWebSocket extends WebSocketClient {
     public void sendDisconnect(String myId, String userId) {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("from_uid", myId);
+        map.put("user_id", myId);
         map.put("user_id", userId);
 //        map.put("data", childMap);
         map.put("ct", "skyrtc");
