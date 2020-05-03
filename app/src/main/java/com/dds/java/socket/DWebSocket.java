@@ -168,7 +168,7 @@ public class DWebSocket extends WebSocketClient {
     private void handleDisConnect(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String fromId = (String) data.get("fromID");
+            String fromId = (String) data.get("from_uid");
             this.iEvent.onDisConnect(fromId);
         }
     }
@@ -176,7 +176,7 @@ public class DWebSocket extends WebSocketClient {
     private void handleTransAudio(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String fromId = (String) data.get("fromID");
+            String fromId = (String) data.get("from_uid");
             this.iEvent.onTransAudio(fromId);
         }
     }
@@ -184,9 +184,9 @@ public class DWebSocket extends WebSocketClient {
     private void handleLogin(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String userID = (String) data.get("userID");
+            String user_uid = (String) data.get("user_uid");
             String avatar = (String) data.get("avatar");
-            this.iEvent.loginSuccess(userID, avatar);
+            this.iEvent.loginSuccess(user_uid, avatar);
         }
 
 
@@ -195,11 +195,11 @@ public class DWebSocket extends WebSocketClient {
     private void handleIceCandidate(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String userID = (String) data.get("userID");
+            String user_uid = (String) data.get("user_uid");
             String id = (String) data.get("id");
             int label = (int) data.get("label");
             String candidate = (String) data.get("candidate");
-            this.iEvent.onIceCandidate(userID, id, label, candidate);
+            this.iEvent.onIceCandidate(user_uid, id, label, candidate);
         }
     }
 
@@ -207,8 +207,8 @@ public class DWebSocket extends WebSocketClient {
         Map data = (Map) map.get("data");
         if (data != null) {
             String sdp = (String) data.get("sdp");
-            String userID = (String) data.get("fromID");
-            this.iEvent.onAnswer(userID, sdp);
+            String user_uid = (String) data.get("from_uid");
+            this.iEvent.onAnswer(user_uid, sdp);
         }
     }
 
@@ -216,8 +216,8 @@ public class DWebSocket extends WebSocketClient {
         Map data = (Map) map.get("data");
         if (data != null) {
             String sdp = (String) data.get("sdp");
-            String userID = (String) data.get("fromID");
-            this.iEvent.onOffer(userID, sdp);
+            String user_uid = (String) data.get("from_uid");
+            this.iEvent.onOffer(user_uid, sdp);
         }
     }
 
@@ -225,7 +225,7 @@ public class DWebSocket extends WebSocketClient {
         Map data = (Map) map.get("data");
         if (data != null) {
             String socket_id = (String) data.get("socket_id");
-            int rejectType = Integer.parseInt(String.valueOf(data.get("refuseType")));
+            int rejectType = (int) data.get("refuse_type");
             this.iEvent.onReject(socket_id, rejectType);
         }
     }
@@ -235,20 +235,20 @@ public class DWebSocket extends WebSocketClient {
         JSONArray arr;
 
         if (data != null) {
-            String userID = (String) data.get("you");
+            String user_uid = (String) data.get("you");
             arr = (JSONArray) data.get("connections");
             String js = JSONObject.toJSONString(arr, SerializerFeature.WriteClassName);
             ArrayList<String> connections = (ArrayList<String>) JSONObject.parseArray(js, String.class);
 
-            this.iEvent.onPeers(userID, connections);
+            this.iEvent.onPeers(user_uid, connections);
         }
     }
 
     private void handleNewPeer(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String userID = (String) data.get("userID");
-            this.iEvent.onNewPeer(userID);
+            String user_uid = (String) data.get("user_uid");
+            this.iEvent.onNewPeer(user_uid);
         }
     }
 
@@ -272,19 +272,19 @@ public class DWebSocket extends WebSocketClient {
     private void handleInvite(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String room = (String) data.get("room");
+            String room = (String) data.get("room_id");
             int audioOnly = (int) data.get("audio_only");
-            String inviteID = (String) data.get("inviteID");
-            String userList = (String) data.get("userList");
-            this.iEvent.onInvite(room, audioOnly == 1, inviteID, userList);
+            String from_uid = (String) data.get("from_uid");
+            String to_uid = (String) data.get("to_uid");
+            this.iEvent.onInvite(room, audioOnly == 1, from_uid, to_uid);
         }
     }
 
     private void handleLeave(Map map) {
         Map data = (Map) map.get("data");
         if (data != null) {
-            String fromID = (String) data.get("fromID");
-            this.iEvent.onLeave(fromID);
+            String from_uid = (String) data.get("from_uid");
+            this.iEvent.onLeave(from_uid);
         }
     }
 
@@ -297,9 +297,9 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "join_room");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("room", room);
+        map.put("room_id", room);
 //        map.put("roomSize", roomSize);
-//        map.put("userID", myId);
+//        map.put("user_uid", myId);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -315,10 +315,10 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "invite");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("room", room);
+        map.put("room_id", room);
         map.put("audio_only", audioOnly ? 1 : 0);
-//        map.put("inviteID", myId);
-//        map.put("userList", users);
+        map.put("from_uid", myId);
+        map.put("to_uid", users);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -350,14 +350,14 @@ public class DWebSocket extends WebSocketClient {
     }
 
     // 发送响铃通知
-    public void sendRing(String myId, String toId) {
+    public void sendRing(String from_uid, String to_uid) {
         Map<String, Object> map = new HashMap<>();
 //        map.put("eventName", "__ring");
         map.put("ct", "skyrtc");
         map.put("ac", "ring");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("fromID", myId);
-        map.put("toID", toId);
+        map.put("from_uid", from_uid);
+        map.put("to_uid", to_uid);
 
 
 //        map.put("data", childMap);
@@ -372,10 +372,10 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        map.put("eventName", "__join");
         map.put("ct", "skyrtc");
-        map.put("ac", "join");
+        map.put("ac", "join_room");
 //        Map<String, String> childMap = new HashMap<>();
-        map.put("room", room);
-        map.put("userID", myId);
+        map.put("room_id", room);
+//        map.put("user_uid", myId);
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
@@ -384,15 +384,15 @@ public class DWebSocket extends WebSocketClient {
     }
 
     // 拒接接听
-    public void sendRefuse(String inviteID, String myId, int refuseType) {
+    public void sendRefuse(String inviteID, String myId, int refuse_type) {
         Map<String, Object> map = new HashMap<>();
 //        map.put("eventName", "__reject");
         map.put("ct", "skyrtc");
         map.put("ac", "reject");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("toID", inviteID);
-        map.put("fromID", myId);
-        map.put("refuseType", String.valueOf(refuseType));
+        map.put("to_uid", inviteID);
+        map.put("from_uid", myId);
+        map.put("refuse_type", String.valueOf(refuse_type));
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -408,9 +408,9 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "leave");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("room", room);
-        map.put("fromID", myId);
-        map.put("userID", userId);
+        map.put("room_id", room);
+        map.put("from_uid", myId);
+        map.put("to_uid", userId);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -426,8 +426,8 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("sdp", sdp);
-        map.put("userID", userId);
-        map.put("fromID", myId);
+        map.put("user_uid", userId);
+        map.put("from_uid", myId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__offer");
         map.put("ct", "skyrtc");
@@ -443,8 +443,8 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("sdp", sdp);
-        map.put("fromID", myId);
-        map.put("userID", userId);
+        map.put("from_uid", myId);
+        map.put("user_uid", userId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__answer");
         map.put("ct", "skyrtc");
@@ -462,7 +462,7 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "ice_candidate");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("userID", userId);
+        map.put("user_uid", userId);
         map.put("id", id);
         map.put("label", label);
         map.put("candidate", candidate);
@@ -480,8 +480,8 @@ public class DWebSocket extends WebSocketClient {
     public void sendTransAudio(String myId, String userId) {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("fromID", myId);
-        map.put("userID", userId);
+        map.put("from_uid", myId);
+        map.put("user_uid", userId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__audio");
 
@@ -497,8 +497,8 @@ public class DWebSocket extends WebSocketClient {
     public void sendDisconnect(String myId, String userId) {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("fromID", myId);
-        map.put("userID", userId);
+        map.put("from_uid", myId);
+        map.put("user_uid", userId);
 //        map.put("data", childMap);
         map.put("ct", "skyrtc");
         map.put("ac", "audio");

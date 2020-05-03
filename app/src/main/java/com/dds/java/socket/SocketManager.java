@@ -53,7 +53,7 @@ public class SocketManager implements IEvent {
             myId = userId;
             URI uri;
             try {
-                String urls = url + "/" + userId + "/" + device;
+                String urls = url + "&user_id=" + userId;
                 Log.i(TAG, "urls=" + urls);
 
                 uri = new URI(urls);
@@ -101,7 +101,7 @@ public class SocketManager implements IEvent {
     @Override
     public void onOpen() {
         Log.i(TAG, "socket is open!");
-        //没有返回，我们自己调用一下
+        //服务器在连接成功后，没有返回loginSuccess，我们自己调用一下
         loginSuccess(myId, "");
     }
 
@@ -117,9 +117,10 @@ public class SocketManager implements IEvent {
 
 
     // ======================================================================================
+    //我们的流程不用创建，这里是直接加入房间
     public void createRoom(String room, int roomSize) {
         if (webSocket != null) {
-            webSocket.createRoom(room, roomSize, myId);
+            webSocket.sendJoin(room, myId);
         }
 
     }
@@ -200,9 +201,9 @@ public class SocketManager implements IEvent {
     public void onInvite(String room, boolean audioOnly, String inviteId, String userList) {
         Intent intent = new Intent();
         intent.putExtra("room", room);
-        intent.putExtra("audioOnly", audioOnly);
-        intent.putExtra("inviteId", inviteId);
-        intent.putExtra("userList", userList);
+        intent.putExtra("audio_only", audioOnly);
+        intent.putExtra("from_uid", inviteId);
+        intent.putExtra("to_uid", userList);
         intent.setAction(Utils.ACTION_VOIP_RECEIVER);
         intent.setComponent(new ComponentName(App.getInstance().getPackageName(), VoipReceiver.class.getName()));
         // 发送广播

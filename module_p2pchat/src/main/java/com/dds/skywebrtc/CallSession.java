@@ -289,10 +289,16 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
                 captureAndroid = null;
             }
 
-            _localStream.dispose();
-            _remoteStream.dispose();
+            if (_localStream != null) {
+                _localStream.dispose();
+            }
+            if (_remoteStream != null) {
+                _remoteStream.dispose();
+            }
             // 关闭peer
-            mPeer.close();
+            if (mPeer != null) {
+                mPeer.close();
+            }
 
             // 释放画布
             if (surfaceTextureHelper != null) {

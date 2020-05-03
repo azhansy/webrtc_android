@@ -18,9 +18,9 @@ public class VoipReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (Utils.ACTION_VOIP_RECEIVER.equals(action)) {
             String room = intent.getStringExtra("room");
-            boolean audioOnly = intent.getBooleanExtra("audioOnly", true);
-            String inviteId = intent.getStringExtra("inviteId");
-            String userList = intent.getStringExtra("userList");
+            boolean audioOnly = intent.getBooleanExtra("audio_only", true);
+            String inviteId = intent.getStringExtra("from_uid");
+            String userList = intent.getStringExtra("to_uid");
             String[] list = userList.split(",");
             SkyEngineKit.init(new VoipEvent());
             boolean b = SkyEngineKit.Instance().startInCall(App.getInstance(), room, inviteId, audioOnly);

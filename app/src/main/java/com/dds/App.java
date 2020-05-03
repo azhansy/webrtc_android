@@ -2,7 +2,7 @@ package com.dds;
 
 import android.app.Application;
 
-import com.squareup.leakcanary.LeakCanary;
+//import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by dds on 2019/8/25.
@@ -15,10 +15,10 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         app = this;
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return;
-        }
-        LeakCanary.install(this);
+//        if (LeakCanary.isInAnalyzerProcess(this)) {
+//            return;
+//        }
+//        LeakCanary.install(this);
 
 
     }
