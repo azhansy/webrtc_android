@@ -161,7 +161,7 @@ public class DWebSocket extends WebSocketClient {
 
         }
         // 切换到语音
-        if (eventName.equals("_audio")) {
+        if (eventName.equals("_trans_audio")) {
             handleTransAudio(map);
             return;
 
@@ -327,7 +327,7 @@ public class DWebSocket extends WebSocketClient {
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("room_id", room);
         map.put("audio_only", audioOnly ? 1 : 0);
-        map.put("user_id", myId);
+//        map.put("user_id", myId);
         map.put("to_user", users);
 
 //        map.put("data", childMap);
@@ -348,7 +348,7 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "cancel");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("user_id", useId);
+//        map.put("user_id", useId);
         map.put("to_user", userList);
 
 
@@ -366,7 +366,7 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "ring");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("user_id", user_id);
+//        map.put("user_id", user_id);
         map.put("to_user", to_user);
 
 
@@ -418,9 +418,9 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "leave_room");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("room_id", room);
+//        map.put("room_id", room);
 //        map.put("user_id", myId);
-        map.put("to_user", userId);
+//        map.put("to_user", userId);
 
 //        map.put("data", childMap);
         JSONObject object = new JSONObject(map);
@@ -436,7 +436,7 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("sdp", sdp);
-        map.put("user_id", userId);
+        map.put("to_user", userId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__offer");
         map.put("ct", "skyrtc");
@@ -453,7 +453,7 @@ public class DWebSocket extends WebSocketClient {
 //        Map<String, Object> childMap = new HashMap<>();
         map.put("sdp", sdp);
 //        map.put("user_id", myId);
-        map.put("user_id", userId);
+        map.put("to_user", userId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__answer");
         map.put("ct", "skyrtc");
@@ -471,7 +471,7 @@ public class DWebSocket extends WebSocketClient {
         map.put("ct", "skyrtc");
         map.put("ac", "ice_candidate");
 //        Map<String, Object> childMap = new HashMap<>();
-        map.put("user_id", userId);
+        map.put("to_user", userId);
         map.put("id", id);
         map.put("label", label);
         map.put("candidate", candidate);
@@ -490,12 +490,12 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
 //        map.put("user_id", myId);
-        map.put("user_id", userId);
+        map.put("to_user", userId);
 //        map.put("data", childMap);
 //        map.put("eventName", "__audio");
 
         map.put("ct", "skyrtc");
-        map.put("ac", "audio");
+        map.put("ac", "trans_audio");
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);
@@ -507,10 +507,10 @@ public class DWebSocket extends WebSocketClient {
         Map<String, Object> map = new HashMap<>();
 //        Map<String, Object> childMap = new HashMap<>();
 //        map.put("user_id", myId);
-        map.put("user_id", userId);
+        map.put("to_user", userId);
 //        map.put("data", childMap);
         map.put("ct", "skyrtc");
-        map.put("ac", "audio");
+        map.put("ac", "trans_audio");
 //        map.put("eventName", "__disconnect");
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
