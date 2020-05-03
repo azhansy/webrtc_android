@@ -1,4 +1,3 @@
 include ':app',
         ':libwebrtc',
-        ':module_p2pchat',
-        ':filepicker'
+        ':module_p2pchat'

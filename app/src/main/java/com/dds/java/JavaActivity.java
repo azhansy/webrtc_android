@@ -2,7 +2,9 @@ package com.dds.java;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -24,25 +26,19 @@ import com.dds.java.voip.VoipEvent;
 import com.dds.skywebrtc.SkyEngineKit;
 import com.dds.skywebrtc.permission.Permissions;
 import com.dds.webrtc.R;
-import com.ess.filepicker.FilePicker;
-import com.ess.filepicker.model.EssFile;
-import com.ess.filepicker.util.Const;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 拨打电话界面
  */
 public class JavaActivity extends AppCompatActivity implements IUserState {
 
-//    private EditText wss;
+    //    private EditText wss;
     private EditText et_name;
     Spinner spinner;
     private TextView user_state;
     private TextView tv_filepath;
     public static int FILE_REQUSET_CODE = 156;
-    public  String[] FILE_TYPES = {"txt", "apk", "jpg", "gif", "png", "bmp", "webp", "mp4", "zip", "rar", "gz", "bz2", "xls", "xlsx", "pdf", "doc", "docx", "amr", "jpeg", "mp3", "rtf", "mov", "pptx", "ppt", "numbers", "key", "pages"};
+    public String[] FILE_TYPES = {"txt", "apk", "jpg", "gif", "png", "bmp", "webp", "mp4", "zip", "rar", "gz", "bz2", "xls", "xlsx", "pdf", "doc", "docx", "amr", "jpeg", "mp3", "rtf", "mov", "pptx", "ppt", "numbers", "key", "pages"};
 
 
     // 0 phone 1 pc
@@ -148,9 +144,9 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == FILE_REQUSET_CODE && data != null) {
-                List<EssFile> files = data.getParcelableArrayListExtra(Const.EXTRA_RESULT_SELECTION);
-                if (!files.isEmpty()) {
-                    String path = files.get(0).getAbsolutePath();
+                Uri uri = data.getData();
+                if (uri != null) {
+                    String path = FileUtils.getPath(this, uri);
                     tv_filepath.setText(path);
                     SocketManager.getInstance().onSendFile(path);
                 }
@@ -171,9 +167,17 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
         Permissions.request(this, per, integer -> {
             if (integer == 0) {
                 // 权限同意
-                FilePicker.from(this).chooseForBrowser().isSingle()
-                        .requestCode(FILE_REQUSET_CODE).setFileTypes(FILE_TYPES)
-                        .start();
+//                FilePicker.from(this).chooseForBrowser().isSingle()
+//                        .requestCode(FILE_REQUSET_CODE).setFileTypes(FILE_TYPES)
+//                        .start();
+                // 调用系统文件管理器
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);
+                try {
+                    startActivityForResult(Intent.createChooser(intent, "Choose File"), FILE_REQUSET_CODE);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "亲，木有文件管理器啊-_-!!", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 // 权限拒绝
                 Toast.makeText(this, "权限已拒绝", Toast.LENGTH_SHORT).show();
