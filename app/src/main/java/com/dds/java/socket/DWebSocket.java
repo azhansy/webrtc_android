@@ -12,15 +12,10 @@ import com.dds.java.FileUtils;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +38,7 @@ public class DWebSocket extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        Log.e("dds_error", "onClose:" + reason + "remote:" + remote+",connectFlag:"+connectFlag);
+        Log.e("dds_error", "onClose:" + reason + "remote:" + remote + ",connectFlag:" + connectFlag);
         if (connectFlag) {
             try {
                 Thread.sleep(3000);
@@ -75,18 +70,6 @@ public class DWebSocket extends WebSocketClient {
     public void onMessage(String message) {
         Log.d(TAG, message);
         handleMessage(message);
-    }
-
-    @Override
-    public void onMessage(ByteBuffer bytes) {
-        Log.d(TAG, "接收到buffer的文件: " + bytes.toString());
-        try {
-            FileChannel fc = new FileOutputStream("data.txt").getChannel();
-            fc.write(bytes);
-            fc.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void setConnectFlag(boolean flag) {
@@ -167,12 +150,28 @@ public class DWebSocket extends WebSocketClient {
 
         }
         // 意外断开
-        if (eventName.equals("_disconnect")) {
-            handleDisConnect(map);
+//        if (eventName.equals("_disconnect")) {
+//            handleDisConnect(map);
+//            return;
+//        }
+
+        if (eventName.equals("_send_file")) {
+            handleFile(map);
             return;
         }
 
 
+    }
+
+    private void handleFile(Map map) {
+        Map data = (Map) map.get("data");
+        if (data != null) {
+            String byteString = (String) data.get("file_byte");
+            String fileName = (String) map.get("file_name");
+            String filePrefix = (String) map.get("file_prefix");
+            //保存的文件名称，为传过来 加个copy名称做区分，后续可去掉
+            FileUtils.read2Io(byteString, "/storage/emulated/0/" + fileName + "_copy" + "." + filePrefix);
+        }
     }
 
     private void handleDisConnect(Map map) {
@@ -519,10 +518,19 @@ public class DWebSocket extends WebSocketClient {
         }
     }
 
-    public void sendFile(String path) {
-        byte[] bytes = FileUtils.readBytes(path);
-        Log.d(TAG, "send--> " + Arrays.toString(bytes));
-        send(bytes);
+    public void sendFile(String userId, String path) {
+        Map<String, Object> map = new HashMap<>();
+        String byteString = FileUtils.read2String(path);
+        map.put("to_user", userId);
+        map.put("ct", "skyrtc");
+        map.put("ac", "send_file");
+        map.put("file_name", "test1");
+        map.put("file_prefix", "txt");
+        map.put("file_byte", byteString);
+        JSONObject object = new JSONObject(map);
+        final String jsonString = object.toString();
+        Log.d(TAG, "send--> " + jsonString);
+        send(jsonString);
     }
 
     // 忽略证书

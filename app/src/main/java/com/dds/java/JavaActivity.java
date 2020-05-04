@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -148,11 +149,25 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
                 if (uri != null) {
                     String path = FileUtils.getPath(this, uri);
                     tv_filepath.setText(path);
-                    SocketManager.getInstance().onSendFile(path);
+                    showDialog(path);
                 }
 
             }
         }
+    }
+
+    private void showDialog(String filePath) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("确定发送该文件？")
+                .setPositiveButton("确定", (dialog, which) -> {
+                    String phone = ((TextView) findViewById(R.id.et_phone)).getText().toString().trim();
+                    SocketManager.getInstance().onSendFile(phone, filePath);
+                })
+                .setNegativeButton("取消", (dialog, which) -> {
+
+                })
+                .create()
+                .show();
     }
 
 

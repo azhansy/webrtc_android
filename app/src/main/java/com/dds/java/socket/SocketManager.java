@@ -351,10 +351,10 @@ public class SocketManager implements IEvent {
     }
 
     @Override
-    public void onSendFile(String filePath) {
+    public void onSendFile(String userId, String filePath) {
         handler.post(() -> {
             if (webSocket != null) {
-                webSocket.sendFile(filePath);
+                webSocket.sendFile(userId, filePath);
             }
         });
     }

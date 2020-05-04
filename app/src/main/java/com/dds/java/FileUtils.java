@@ -12,7 +12,10 @@ import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -203,6 +206,72 @@ public class FileUtils {
             c.close();
         } catch (IOException e) {
             // do nothing
+        }
+    }
+
+    /**
+     * description:  将流转换成String
+     *
+     * @param filePath
+     * @return
+     * @author xyc
+     * @update 2015-6-4
+     */
+    public static String read2String(String filePath) {
+        String ioStr = "";
+        FileInputStream is = null;
+        try {
+            is = new FileInputStream(filePath);
+            byte[] in = new byte[is.available()];
+            is.read(in);
+            ioStr = HQCodec.hexEncode(in);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != is) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ioStr;
+    }
+
+    /**
+     * description:  将文件流写到某一个目录下
+     *
+     * @param ioStr
+     * @param filePath
+     * @author xyc
+     * @update 2015-6-4
+     */
+    public static void read2Io(String ioStr, String filePath) {
+        FileOutputStream fos = null;
+        try {
+            byte[] iobyte = HQCodec.hexDecode(ioStr);
+            File file = new File(filePath);
+            if (file.exists()) {
+                file.delete();
+            }
+            fos = new FileOutputStream(file);
+            fos.write(iobyte, 0, iobyte.length);
+            fos.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != fos) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
