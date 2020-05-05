@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -147,6 +148,7 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
             if (requestCode == FILE_REQUSET_CODE && data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
+                    Log.e("azhansy", "uri:" + uri);
                     String path = FileUtils.getPath(this, uri);
                     tv_filepath.setText(path);
                     showDialog(path);
@@ -158,7 +160,7 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
 
     private void showDialog(String filePath) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("确定发送该文件？")
+        builder.setMessage("确定发送该文件？\n"+filePath)
                 .setPositiveButton("确定", (dialog, which) -> {
                     String phone = ((TextView) findViewById(R.id.et_phone)).getText().toString().trim();
                     SocketManager.getInstance().onSendFile(phone, filePath);
