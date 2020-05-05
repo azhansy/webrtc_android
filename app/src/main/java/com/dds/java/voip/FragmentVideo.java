@@ -1,8 +1,14 @@
 package com.dds.java.voip;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +17,17 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.dds.skywebrtc.CallSession;
 import com.dds.skywebrtc.EnumType;
+import com.dds.skywebrtc.FileUtils;
 import com.dds.skywebrtc.SkyEngineKit;
+import com.dds.skywebrtc.permission.Permissions;
 import com.dds.webrtc.R;
 
 import org.webrtc.SurfaceViewRenderer;
@@ -34,6 +45,7 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
     private LinearLayout inviteeInfoContainer;
     private ImageView portraitImageView;
     private TextView nameTextView;
+    private TextView tv_file;
     private TextView descTextView;
     private ImageView minimizeImageView;
     private ImageView outgoingAudioOnlyImageView;
@@ -82,6 +94,7 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
         pipRenderer = view.findViewById(R.id.pip_video_view);
         inviteeInfoContainer = view.findViewById(R.id.inviteeInfoContainer);
         portraitImageView = view.findViewById(R.id.portraitImageView);
+        tv_file = view.findViewById(R.id.tv_file);
         nameTextView = view.findViewById(R.id.nameTextView);
         descTextView = view.findViewById(R.id.descTextView);
         minimizeImageView = view.findViewById(R.id.minimizeImageView);
@@ -111,6 +124,7 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
         outgoingAudioOnlyImageView.setOnClickListener(this);
         incomingAudioOnlyImageView.setOnClickListener(this);
         connectedAudioOnlyImageView.setOnClickListener(this);
+        tv_file.setOnClickListener(this);
 
         minimizeImageView.setOnClickListener(this);
 
@@ -262,6 +276,10 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
         int id = v.getId();
         // 接听
         CallSession session = gEngineKit.getCurrentSession();
+        if (id == R.id.tv_file) {
+            chooseFile();
+            return;
+        }
         if (id == R.id.acceptImageView) {
             if (session != null && session.getState() == EnumType.CallState.Incoming) {
                 session.joinHome();
@@ -314,4 +332,71 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("azhansy", "onActivityResult:fragment");
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == FILE_REQUSET_CODE && data != null) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    Log.e("azhansy", "uri:" + uri);
+                    String path = FileUtils.getPath(getActivity(), uri);
+//                    tv_filepath.setText(path);
+                    showDialog(path);
+                }
+
+            }
+        }
+    }
+
+    public static int FILE_REQUSET_CODE = 156;
+
+    private void showDialog(String filePath) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("确定发送该文件？\n" + filePath)
+                .setPositiveButton("确定", (dialog, which) -> {
+                    CallSession session = gEngineKit.getCurrentSession();
+
+                    if (session != null) {
+                        session.sendFile(filePath, session.mMyId + System.currentTimeMillis());
+                    }
+//                    String phone = ((TextView) findViewById(R.id.et_phone)).getText().toString().trim();
+//                    SocketManager.getInstance().onSendFile(phone, filePath);
+                })
+                .setNegativeButton("取消", (dialog, which) -> {
+
+                })
+                .create()
+                .show();
+    }
+
+    /**
+     * 选择文件
+     */
+    public void chooseFile() {
+        // 权限检测
+        String[] per = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        Permissions.request(getActivity(), per, integer -> {
+            if (integer == 0) {
+                // 权限同意
+//                FilePicker.from(this).chooseForBrowser().isSingle()
+//                        .requestCode(FILE_REQUSET_CODE).setFileTypes(FILE_TYPES)
+//                        .start();
+                // 调用系统文件管理器
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);
+                try {
+                    startActivityForResult(Intent.createChooser(intent, "Choose File"), FILE_REQUSET_CODE);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(getActivity(), "亲，木有文件管理器啊-_-!!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // 权限拒绝
+                Toast.makeText(getActivity(), "权限已拒绝", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
 }

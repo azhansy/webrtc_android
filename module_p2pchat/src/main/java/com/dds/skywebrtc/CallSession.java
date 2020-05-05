@@ -95,6 +95,14 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     // ----------------------------------------各种控制--------------------------------------------
 
+    public void sendFile(String filePath, String sendId) {
+
+        if (mPeer != null) {
+            mPeer.sendDataChannelMessage(filePath, sendId);
+        }
+    }
+
+
     // 创建房间
     public void createHome(String room, int roomSize) {
         executor.execute(() -> {
@@ -352,7 +360,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
             }
             if (mIsComing) {
                 // 创建Peer
-                mPeer = new Peer(CallSession.this, mTargetId);
+                mPeer = new Peer(mContext, CallSession.this, mTargetId);
                 // 接电话一方
                 mPeer.setOffer(true);
                 // 添加本地流
@@ -399,7 +407,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
                 createLocalStream();
             }
             try {
-                mPeer = new Peer(CallSession.this, userId);
+                mPeer = new Peer(mContext, CallSession.this, userId);
                 mPeer.addLocalStream(_localStream);
             } catch (Exception e) {
                 Log.e(TAG, e.toString());

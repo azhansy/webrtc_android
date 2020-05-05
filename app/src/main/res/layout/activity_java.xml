@@ -115,6 +115,7 @@
         android:layout_marginTop="20dp"
         android:onClick="chooseFile"
         android:text="选择文件"
+        android:visibility="gone"
         android:textAllCaps="false" />
     <TextView
         android:id="@+id/tv_filepath"

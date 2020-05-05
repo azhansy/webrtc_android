@@ -143,6 +143,10 @@ public class SkyEngineKit {
 
     }
 
+    public void sendFile() {
+
+    }
+
 
     // 获取对话实例
     public CallSession getCurrentSession() {

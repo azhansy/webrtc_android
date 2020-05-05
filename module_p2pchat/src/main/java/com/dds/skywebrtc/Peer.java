@@ -1,6 +1,9 @@
 package com.dds.skywebrtc;
 
+import android.content.Context;
 import android.util.Log;
+
+import com.alibaba.fastjson.JSONObject;
 
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
@@ -11,6 +14,11 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +26,10 @@ import java.util.List;
  * Created by dds on 2020/3/11.
  * android_shuai@163.com
  */
-public class Peer implements SdpObserver, PeerConnection.Observer {
+public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.Observer {
     private final static String TAG = "dds_Peer";
     private PeerConnection pc;
+    private DataChannel mDataChannel;
     private String userId;
     private List<IceCandidate> queuedRemoteCandidates;
     private SessionDescription localSdp;
@@ -28,10 +37,15 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
 
 
     private boolean isOffer;
+    private Context mContext;
 
-    public Peer(CallSession session, String userId) {
+    public Peer(Context context, CallSession session, String userId) {
         this.mSession = session;
         this.pc = createPeerConnection();
+        this.mContext = context;
+        DataChannel.Init dcInit = new DataChannel.Init();
+        dcInit.id = 1;
+        mDataChannel = pc.createDataChannel("P2P MSG DC", dcInit);
         this.userId = userId;
         queuedRemoteCandidates = new ArrayList<>();
 
@@ -168,6 +182,7 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
     @Override
     public void onDataChannel(DataChannel dataChannel) {
         Log.i(TAG, "onDataChannel:");
+        dataChannel.registerObserver(this);
     }
 
     @Override
@@ -263,5 +278,121 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
         mediaConstraints.mandatory.addAll(keyValuePairs);
         return mediaConstraints;
     }
+
+
+    /////////////////////////////DataChannel=============
+
+    @Override
+    public void onBufferedAmountChange(long previousAmount) {
+        Log.i(TAG, "DataChannel onBufferedAmountChange:" + previousAmount);
+
+    }
+
+    @Override
+    public void onStateChange() {
+        Log.i(TAG, "DataChannel onStateChange:");
+
+    }
+
+    @Override
+    public void onMessage(DataChannel.Buffer buffer) {
+        //保存的文件名称，为传过来 加个copy名称做区分，后续可去掉
+//        FileUtils.read2Io(byteString, "/storage/emulated/0/" + fileName + "_copy" + "." + filePrefix);
+        // onMessage 回调中处理消息
+        ByteBuffer data = buffer.data;
+        final byte[] bytes = new byte[data.capacity()];
+        data.get(bytes);
+        String msg = new String(bytes);
+        Log.d(TAG, "onMessage " + msg);
+
+        JSONObject jsonObject = JSONObject.parseObject(msg);
+//        Map map = JSON.parseObject(msg, Map.class);
+        String type = (String) jsonObject.get("type");
+        if (type == null) return;
+////        // 传输文件
+        if (type.equals("file")) {
+            handleFile(jsonObject);
+            return;
+        }
+
+    }
+
+    private void handleFile(JSONObject map) {
+        JSONObject data = map.getJSONObject("data");
+        if (data != null) {
+            Log.d(TAG, "onMessage handleFile,data=" + data);
+            int chunks = (int) data.get("chunks");
+            int chunk = (int) data.get("chunk");
+            String file_name = (String) data.get("file_name");
+            String send_id = (String) data.get("send_id");
+            int block_size = (int) data.get("block_size");
+            String fileStr = (String) data.get("file_byte");
+            File file = FileUtils.getAppDir(mContext);
+            String filePath = file.getAbsolutePath() + "/" + file_name;
+
+            Log.d(TAG, "onMessage handleFile,filePath=" + filePath);
+
+            FileUtils.appendFileWithInstream(filePath,
+                    new ByteArrayInputStream(fileStr.getBytes()),
+                    block_size*chunk);
+        }
+    }
+
+
+
+    void sendDataChannelMessage(String filePath, String sendId) {
+        long blockSize = FileUtils.SIZE_1M; //每块大小
+        long chunks = 1L; //默认1块
+        File file = new File(filePath);
+        long fileLength = file.length();
+        if (fileLength < blockSize) {  //如果文件大小 小于1MB，chunks默认为1，并且blockSize为file.length
+            blockSize = fileLength;
+        } else {
+            if (fileLength % blockSize == 0L) {  //块数
+                chunks = (fileLength / blockSize);
+            } else {
+                chunks = ((fileLength / blockSize)) + 1;
+            }
+        }
+
+        for (long i = 0; i < chunks; i++) {
+            long offset = i * blockSize;
+
+            if (chunks > 1 && i == chunks - 1) {
+                //如果块数大于1个,并且是最后一块数据，需要计算最后一块的blockSize
+                blockSize = (fileLength - (blockSize * (chunks - 1)));
+            }
+
+            byte[] mBlock = FileUtils.getBlock(offset, file, (int) blockSize);
+
+//            Map<String, Object> map = new HashMap<>();
+//            Map<String, Object> childMap = new HashMap<>();
+
+            JSONObject jsonObject = new JSONObject();
+            JSONObject childObject = new JSONObject();
+            childObject.put("chunks", chunks);
+            childObject.put("chunk", i);
+            childObject.put("file_name", getSuffixName(filePath));
+            childObject.put("block_size", blockSize);
+            childObject.put("send_id", sendId);
+            childObject.put("file_byte", new String(mBlock));
+            jsonObject.put("type", "file");
+            jsonObject.put("data", childObject);
+            DataChannel.Buffer buffer = new DataChannel.Buffer(ByteBuffer.wrap(jsonObject.toString().getBytes()), false);
+            mDataChannel.send(buffer);
+            Log.i(TAG, "DataChannel 开始传输文件分片，i=" + i + ",map=" + jsonObject.toString());
+
+        }
+
+//        byte[] msg = "azhansy".getBytes();
+//        DataChannel.Buffer buffer = new DataChannel.Buffer(ByteBuffer.wrap(msg), false);
+//        mDataChannel.send(buffer);
+    }
+
+    String getSuffixName(String filePath) {
+        return filePath.substring(filePath.lastIndexOf("/") + 1);
+    }
+
+//
 
 }

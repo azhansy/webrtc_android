@@ -1,4 +1,4 @@
-package com.dds.java;
+package com.dds.skywebrtc;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -18,6 +18,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 /**
  * @author dashu
@@ -25,6 +27,7 @@ import java.io.IOException;
  * describe:
  */
 public class FileUtils {
+    public static final long SIZE_1M = 1024 * 1024;
 
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
@@ -56,10 +59,10 @@ public class FileUtils {
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
 
-                 String id = DocumentsContract.getDocumentId(uri);
+                String id = DocumentsContract.getDocumentId(uri);
                 if (!TextUtils.isEmpty(id)) {
                     if (id.startsWith("raw:")) {
-                        id =  id.replaceFirst("raw:", "");
+                        id = id.replaceFirst("raw:", "");
                     }
                     if (id.startsWith("msf:")) {
                         return null;
@@ -285,6 +288,103 @@ public class FileUtils {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public static byte[] getBlock(long offset, File file, int blockSize) {
+        byte[] result = new byte[blockSize];
+        RandomAccessFile accessFile = null;
+        try {
+            accessFile = new RandomAccessFile(file, "r");
+            accessFile.seek(offset);
+            int readSize = accessFile.read(result);
+            if (readSize == -1) {
+                return null;
+            } else if (readSize == blockSize) {
+                return result;
+            } else {
+                byte[] tmpByte = new byte[readSize];
+                System.arraycopy(result, 0, tmpByte, 0, readSize);
+                return tmpByte;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (accessFile != null) {
+                try {
+                    accessFile.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public static String ROOT_PATH = "webrtc/";
+
+    //获取文件存放根路径
+    public static File getAppDir(Context context) {
+        String dirPath = "";
+        //SD卡是否存在
+        boolean isSdCardExists = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+        boolean isRootDirExists = Environment.getExternalStorageDirectory().exists();
+        if (isSdCardExists && isRootDirExists) {
+            dirPath = String.format("%s/%s/", Environment.getExternalStorageDirectory().getAbsolutePath(), ROOT_PATH);
+        } else {
+            dirPath = String.format("%s/%s/", context.getApplicationContext().getFilesDir().getAbsolutePath(), ROOT_PATH);
+        }
+
+        File appDir = new File(dirPath);
+        if (!appDir.exists()) {
+            appDir.mkdirs();
+        }
+        return appDir;
+    }
+
+
+    /**
+     * 文件分批写入
+     *
+     * @param fileName    文件路径
+     * @param inputStream 需要写入的内容
+     * @param start       写入的初始位置
+     */
+    public synchronized static void appendFileWithInstream(String fileName, InputStream inputStream, long start) {
+        File file = new File(fileName);
+        RandomAccessFile randomAccessFile = null;
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            randomAccessFile = new RandomAccessFile(file, "rw");
+            final long M = 1024;
+            byte[] bytes = new byte[(int) M];
+            long seek = start;
+            long total = 0;
+            for (; ; ) {
+                int readCount = inputStream.read(bytes);
+
+                if (readCount == 0) {
+                    continue;
+                }
+                if (readCount == -1) {
+                    Log.d("azhansy", "readCount = " + readCount + "\n start = " + start + "\ntotal = " + total);
+                    Log.d("azhansy", "fileLength = " + randomAccessFile.length()+ "\n seek = " + seek );
+                    inputStream.close();
+                    break;
+                }
+                total += readCount;
+                randomAccessFile.seek(seek );
+                randomAccessFile.write(bytes, 0, readCount);
+                seek += readCount;
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

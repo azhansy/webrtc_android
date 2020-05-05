@@ -39,7 +39,7 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
     Spinner spinner;
     private TextView user_state;
     private TextView tv_filepath;
-    public static int FILE_REQUSET_CODE = 156;
+//    public static int FILE_REQUSET_CODE = 156;
     public String[] FILE_TYPES = {"txt", "apk", "jpg", "gif", "png", "bmp", "webp", "mp4", "zip", "rar", "gz", "bz2", "xls", "xlsx", "pdf", "doc", "docx", "amr", "jpeg", "mp3", "rtf", "mov", "pptx", "ppt", "numbers", "key", "pages"};
 
 
@@ -141,65 +141,65 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
         user_state.setTextColor(ContextCompat.getColor(JavaActivity.this, android.R.color.darker_gray));
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == FILE_REQUSET_CODE && data != null) {
-                Uri uri = data.getData();
-                if (uri != null) {
-                    Log.e("azhansy", "uri:" + uri);
-                    String path = FileUtils.getPath(this, uri);
-                    tv_filepath.setText(path);
-                    showDialog(path);
-                }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == Activity.RESULT_OK) {
+//            if (requestCode == FILE_REQUSET_CODE && data != null) {
+//                Uri uri = data.getData();
+//                if (uri != null) {
+//                    Log.e("azhansy", "uri:" + uri);
+//                    String path = FileUtils.getPath(this, uri);
+//                    tv_filepath.setText(path);
+//                    showDialog(path);
+//                }
+//
+//            }
+//        }
+//    }
 
-            }
-        }
-    }
-
-    private void showDialog(String filePath) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("确定发送该文件？\n"+filePath)
-                .setPositiveButton("确定", (dialog, which) -> {
-                    String phone = ((TextView) findViewById(R.id.et_phone)).getText().toString().trim();
-                    SocketManager.getInstance().onSendFile(phone, filePath);
-                })
-                .setNegativeButton("取消", (dialog, which) -> {
-
-                })
-                .create()
-                .show();
-    }
+//    private void showDialog(String filePath) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage("确定发送该文件？\n"+filePath)
+//                .setPositiveButton("确定", (dialog, which) -> {
+//                    String phone = ((TextView) findViewById(R.id.et_phone)).getText().toString().trim();
+//                    SocketManager.getInstance().onSendFile(phone, filePath);
+//                })
+//                .setNegativeButton("取消", (dialog, which) -> {
+//
+//                })
+//                .create()
+//                .show();
+//    }
 
 
-    /**
-     * 选择文件
-     *
-     * @param view
-     */
-    public void chooseFile(View view) {
-        // 权限检测
-        String[] per = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        Permissions.request(this, per, integer -> {
-            if (integer == 0) {
-                // 权限同意
-//                FilePicker.from(this).chooseForBrowser().isSingle()
-//                        .requestCode(FILE_REQUSET_CODE).setFileTypes(FILE_TYPES)
-//                        .start();
-                // 调用系统文件管理器
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);
-                try {
-                    startActivityForResult(Intent.createChooser(intent, "Choose File"), FILE_REQUSET_CODE);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(this, "亲，木有文件管理器啊-_-!!", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // 权限拒绝
-                Toast.makeText(this, "权限已拒绝", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
+//    /**
+//     * 选择文件
+//     *
+//     * @param view
+//     */
+//    public void chooseFile(View view) {
+//        // 权限检测
+//        String[] per = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+//        Permissions.request(this, per, integer -> {
+//            if (integer == 0) {
+//                // 权限同意
+////                FilePicker.from(this).chooseForBrowser().isSingle()
+////                        .requestCode(FILE_REQUSET_CODE).setFileTypes(FILE_TYPES)
+////                        .start();
+//                // 调用系统文件管理器
+//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                intent.setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);
+//                try {
+//                    startActivityForResult(Intent.createChooser(intent, "Choose File"), FILE_REQUSET_CODE);
+//                } catch (ActivityNotFoundException e) {
+//                    Toast.makeText(this, "亲，木有文件管理器啊-_-!!", Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                // 权限拒绝
+//                Toast.makeText(this, "权限已拒绝", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//    }
 }

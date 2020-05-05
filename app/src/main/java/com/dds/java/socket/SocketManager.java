@@ -113,9 +113,6 @@ public class SocketManager implements IEvent {
         if (iUserState != null && iUserState.get() != null) {
             iUserState.get().userLogin();
         }
-        if (webSocket != null) {
-            Log.i(TAG, "重连 试试:" + userId);
-        }
     }
 
 
@@ -358,6 +355,16 @@ public class SocketManager implements IEvent {
             }
         });
     }
+
+//    @Override
+//    public void onReJoinRoom() {
+//        handler.post(() -> {
+//            CallSession currentSession = SkyEngineKit.Instance().getCurrentSession();
+//            if (webSocket != null && currentSession != null) {
+//                webSocket.sendJoin(currentSession.mRoom, currentSession.mMyId);
+//            }
+//        });
+//    }
 
     //===========================================================================================
 

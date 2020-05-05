@@ -102,4 +102,16 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/tv_file"
+        android:text="传输文件"
+        android:textSize="30sp"
+        android:layout_gravity="bottom"
+        android:padding="50dp"
+        android:layout_marginBottom="200dp"
+        android:background="?selectableItemBackground"
+        android:textColor="@android:color/holo_blue_dark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </FrameLayout>

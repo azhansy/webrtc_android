@@ -48,4 +48,6 @@ public interface IEvent {
 
     void onSendFile(String userId, String filePath);
 
+//    void onReJoinRoom();
+
 }

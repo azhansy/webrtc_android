@@ -7,12 +7,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.dds.java.FileUtils;
+import com.dds.skywebrtc.FileUtils;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -61,8 +62,12 @@ public class DWebSocket extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        Log.e("dds_info", "onOpen");
+        Log.e("dds_info", "onOpen,connectFlag=" + connectFlag);
         this.iEvent.onOpen();
+        if (connectFlag) {
+            //重连进入房间
+//            this.iEvent.onReJoinRoom();
+        }
         connectFlag = true;
     }
 
@@ -70,6 +75,13 @@ public class DWebSocket extends WebSocketClient {
     public void onMessage(String message) {
         Log.d(TAG, message);
         handleMessage(message);
+    }
+
+
+    @Override
+    public void onMessage(ByteBuffer bytes) {
+        Log.d(TAG, "ByteBuffer:" + bytes);
+
     }
 
     public void setConnectFlag(boolean flag) {
@@ -155,24 +167,24 @@ public class DWebSocket extends WebSocketClient {
 //            return;
 //        }
 
-        if (eventName.equals("_send_file")) {
-            handleFile(map);
-            return;
-        }
+//        if (eventName.equals("_send_file")) {
+//            handleFile(map);
+//            return;
+//        }
 
 
     }
 
-    private void handleFile(Map map) {
-        Map data = (Map) map.get("data");
-        if (data != null) {
-            String byteString = (String) data.get("file_byte");
-            String fileName = (String) map.get("file_name");
-            String filePrefix = (String) map.get("file_prefix");
+//    private void handleFile(Map map) {
+//        Map data = (Map) map.get("data");
+//        if (data != null) {
+//            String byteString = (String) data.get("file_byte");
+//            String fileName = (String) map.get("file_name");
+//            String filePrefix = (String) map.get("file_prefix");
             //保存的文件名称，为传过来 加个copy名称做区分，后续可去掉
-            FileUtils.read2Io(byteString, "/storage/emulated/0/" + fileName + "_copy" + "." + filePrefix);
-        }
-    }
+//            FileUtils.read2Io(byteString, "/storage/emulated/0/" + fileName + "_copy" + "." + filePrefix);
+//        }
+//    }
 
     private void handleDisConnect(Map map) {
         Map data = (Map) map.get("data");
@@ -519,18 +531,18 @@ public class DWebSocket extends WebSocketClient {
     }
 
     public void sendFile(String userId, String path) {
-        Map<String, Object> map = new HashMap<>();
-        String byteString = FileUtils.read2String(path);
-        map.put("to_user", userId);
-        map.put("ct", "skyrtc");
-        map.put("ac", "send_file");
-        map.put("file_name", "test1");
-        map.put("file_prefix", "txt");
-        map.put("file_byte", byteString);
-        JSONObject object = new JSONObject(map);
-        final String jsonString = object.toString();
-        Log.d(TAG, "send--> " + jsonString);
-        send(jsonString);
+//        Map<String, Object> map = new HashMap<>();
+//        String byteString = FileUtils.read2String(path);
+//        map.put("to_user", userId);
+//        map.put("ct", "skyrtc");
+//        map.put("ac", "send_file");
+//        map.put("file_name", "test1");
+//        map.put("file_prefix", "txt");
+//        map.put("file_byte", byteString);
+//        JSONObject object = new JSONObject(map);
+//        final String jsonString = object.toString();
+//        Log.d(TAG, "send--> " + jsonString);
+//        send(jsonString);
     }
 
     // 忽略证书
