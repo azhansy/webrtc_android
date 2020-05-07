@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +24,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.dds.java.socket.SocketManager;
 import com.dds.skywebrtc.CallSession;
 import com.dds.skywebrtc.EnumType;
 import com.dds.skywebrtc.FileUtils;
+import com.dds.skywebrtc.PeerOperator;
 import com.dds.skywebrtc.SkyEngineKit;
 import com.dds.skywebrtc.permission.Permissions;
 import com.dds.webrtc.R;
@@ -38,7 +41,7 @@ import org.webrtc.SurfaceViewRenderer;
  * android_shuai@163.com
  * 视频通话控制界面
  */
-public class FragmentVideo extends Fragment implements CallSession.CallSessionCallback, View.OnClickListener {
+public class FragmentVideo extends Fragment implements CallSession.CallSessionCallback, View.OnClickListener, PeerOperator {
 
     private FrameLayout fullscreenRenderer;
     private FrameLayout pipRenderer;
@@ -72,6 +75,7 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
     private boolean isFromFloatingView;
     private SurfaceViewRenderer localSurfaceView;
     private SurfaceViewRenderer remoteSurfaceView;
+    private TextView tvOpera;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,6 +118,8 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
         incomingActionContainer = view.findViewById(R.id.incomingActionContainer);
         outgoingActionContainer = view.findViewById(R.id.outgoingActionContainer);
         connectedActionContainer = view.findViewById(R.id.connectedActionContainer);
+        tvOpera = view.findViewById(R.id.tv_operation);
+        tvOpera.setMovementMethod(new ScrollingMovementMethod());
 
         outgoingHangupImageView.setOnClickListener(this);
         incomingHangupImageView.setOnClickListener(this);
@@ -162,6 +168,13 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
         }
 
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        gEngineKit.getCurrentSession().setPeerOperator(this);
+        SocketManager.getInstance().setPeerOperator(this);
     }
 
     @Override
@@ -398,5 +411,128 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
             }
         });
 
+    }
+
+    private StringBuffer sb = new StringBuffer();
+
+    @Override
+    public void createSdpSuccess() {
+        sb.append("----------------------------\n");
+        sb.append("createSdpSuccess");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void sendOffer() {
+        sb.append("----------------------------\n");
+        sb.append("sendOffer");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void sendAnswer() {
+        sb.append("----------------------------\n");
+        sb.append("sendAnswer");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void sendCandidate() {
+        sb.append("----------------------------\n");
+        sb.append("sendCandidate");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void setSdpSuccess() {
+        sb.append("----------------------------\n");
+        sb.append("setSdpSuccess");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void iceRestart() {
+        sb.append("----------------------------\n");
+        sb.append("iceRestart");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void connectedComplete() {
+        sb = new StringBuffer();
+        tvOpera.setText("");
+    }
+
+    @Override
+    public void connectedFailed() {
+        sb.append("?????????????????????\n");
+        sb.append("ICE connected Failed");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void receiveOffer() {
+        sb.append("----------------------------\n");
+        sb.append("receiveOffer");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void receiveAnswer() {
+        sb.append("----------------------------\n");
+        sb.append("receiveAnswer");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void socketOpen(int offerSize, int iceSize) {
+        sb.append("----------------------------\n");
+        sb.append("socketOpen");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void loginSuccess(String userId) {
+        sb.append("----------------------------\n");
+        sb.append("loginSuccess");
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    @Override
+    public void socketState(String state) {
+        sb.append("----------------------------\n");
+        sb.append(state);
+        sb.append("\n\n");
+        tvOpera.setText(sb.toString());
+        scrollToBottom();
+    }
+
+    private void scrollToBottom() {
+        int offset = tvOpera.getLineCount() * tvOpera.getLineHeight();
+        if (offset > tvOpera.getHeight()) {
+            tvOpera.scrollTo(0, offset - tvOpera.getHeight());
+        }
     }
 }

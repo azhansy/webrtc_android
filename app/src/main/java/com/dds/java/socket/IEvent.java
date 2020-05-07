@@ -1,5 +1,7 @@
 package com.dds.java.socket;
 
+import com.dds.skywebrtc.PeerOperator;
+
 import java.util.ArrayList;
 
 /**
@@ -50,4 +52,5 @@ public interface IEvent {
 
 //    void onReJoinRoom();
 
+    PeerOperator getPeerOperate();
 }

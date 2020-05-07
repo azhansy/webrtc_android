@@ -37,6 +37,14 @@ public class SkyEngineKit {
             avEngineKit.mEvent = iSocketEvent;
 
             // 初始化一些stun和turn的地址
+            PeerConnection.IceServer var1 = PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
+                    .createIceServer();
+            avEngineKit.iceServers.add(var1);
+
+
+            PeerConnection.IceServer var11 = PeerConnection.IceServer.builder("stun:47.93.186.97:3478?transport=udp")
+                    .createIceServer();
+
             PeerConnection.IceServer var12 = PeerConnection.IceServer.builder("stun:coturn.aoidc.net:3478?transport=udp")
                     .setUsername("kaka")
                     .setPassword("kaka#kaka")
@@ -45,7 +53,7 @@ public class SkyEngineKit {
                     .setUsername("kaka")
                     .setPassword("kaka#kaka")
                     .createIceServer();
-//            avEngineKit.iceServers.add(var11);
+            avEngineKit.iceServers.add(var11);
             avEngineKit.iceServers.add(var12);
             avEngineKit.iceServers.add(var13);
 

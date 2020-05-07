@@ -18,12 +18,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.dds.App;
 import com.dds.skywebrtc.CallSession;
 import com.dds.skywebrtc.EnumType;
+import com.dds.skywebrtc.PeerOperator;
 import com.dds.skywebrtc.SkyEngineKit;
 import com.dds.skywebrtc.except.NotInitializedException;
 import com.dds.skywebrtc.permission.Permissions;
 import com.dds.webrtc.R;
+
+import org.webrtc.VideoFrame;
 
 import java.util.UUID;
 
@@ -113,8 +117,8 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
 
     }
 
+    Fragment fragment;
     private void init(String targetId, boolean outgoing, boolean audioOnly, boolean isReplace) {
-        Fragment fragment;
         if (audioOnly) {
             fragment = new FragmentAudio();
         } else {
@@ -135,7 +139,7 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
         if (outgoing) {
             // 创建会话
             String room = UUID.randomUUID().toString() + System.currentTimeMillis();
-            boolean b = gEngineKit.startOutCall(getApplicationContext(), room, targetId, audioOnly);
+            boolean b = gEngineKit.startOutCall(this, room, targetId, audioOnly);
             if (!b) {
                 finish();
                 return;

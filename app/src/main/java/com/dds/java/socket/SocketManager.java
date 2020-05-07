@@ -10,13 +10,17 @@ import com.dds.App;
 import com.dds.java.voip.Utils;
 import com.dds.java.voip.VoipReceiver;
 import com.dds.skywebrtc.CallSession;
+import com.dds.skywebrtc.Offer;
+import com.dds.skywebrtc.PeerOperator;
 import com.dds.skywebrtc.SkyEngineKit;
+import com.dds.skywebrtc.UserIceCandidate;
 
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -34,6 +38,10 @@ public class SocketManager implements IEvent {
 
 
     private Handler handler = new Handler(Looper.getMainLooper());
+    private Offer offer;
+
+    private List<UserIceCandidate> candidateList = new ArrayList<>();
+    public PeerOperator peerOperator;
 
     private SocketManager() {
 
@@ -46,6 +54,11 @@ public class SocketManager implements IEvent {
 
     public static SocketManager getInstance() {
         return Holder.socketManager;
+    }
+
+
+    public void setPeerOperator(PeerOperator peerOperator) {
+        this.peerOperator = peerOperator;
     }
 
     public void connect(String url, String userId, int device) {
@@ -103,11 +116,35 @@ public class SocketManager implements IEvent {
         Log.i(TAG, "socket is open!");
         //服务器在连接成功后，没有返回loginSuccess，我们自己调用一下
         loginSuccess(myId, "");
+
+        if (webSocket != null && webSocket.connectFlag) {
+            webSocket.reJoinRoom(SkyEngineKit.Instance().getCurrentSession().mRoom, 1);
+        }
+
+        if (peerOperator != null) {
+            peerOperator.socketOpen(offer == null ? 0 : 1, candidateList.size());
+        }
+
+        if (offer != null) {
+            sendOffer(offer.userId, offer.sdp);
+            offer = null;
+        }
+
+        if (!candidateList.isEmpty()) {
+            for (UserIceCandidate candidate :
+                    candidateList) {
+                sendIceCandidate(candidate.userId, candidate.sdpMid, candidate.sdpMLineIndex, candidate.sdp);
+            }
+            candidateList.clear();
+        }
     }
 
     @Override
     public void loginSuccess(String userId, String avatar) {
         Log.i(TAG, "loginSuccess:" + userId);
+        if (peerOperator != null) {
+            peerOperator.loginSuccess(userId);
+        }
         myId = userId;
         userState = 1;
         if (iUserState != null && iUserState.get() != null) {
@@ -166,8 +203,10 @@ public class SocketManager implements IEvent {
     }
 
     public void sendOffer(String userId, String sdp) {
-        if (webSocket != null) {
+        if (webSocket != null && webSocket.isOpen()) {
             webSocket.sendOffer(myId, userId, sdp);
+        } else {
+            offer = new Offer(userId, sdp);
         }
     }
 
@@ -178,8 +217,10 @@ public class SocketManager implements IEvent {
     }
 
     public void sendIceCandidate(String userId, String id, int label, String candidate) {
-        if (webSocket != null) {
+        if (webSocket != null && webSocket.isOpen()) {
             webSocket.sendIceCandidate(userId, id, label, candidate);
+        } else {
+            candidateList.add(new UserIceCandidate(userId, id, label, candidate));
         }
     }
 
@@ -365,6 +406,11 @@ public class SocketManager implements IEvent {
 //            }
 //        });
 //    }
+
+    @Override
+    public PeerOperator getPeerOperate() {
+        return peerOperator;
+    }
 
     //===========================================================================================
 

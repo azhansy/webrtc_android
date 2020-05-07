@@ -29,7 +29,7 @@ import javax.net.ssl.X509TrustManager;
 public class DWebSocket extends WebSocketClient {
     private final static String TAG = "dds_WebSocket";
     private IEvent iEvent;
-    private boolean connectFlag = false;
+    boolean connectFlag = false;
 
 
     public DWebSocket(URI serverUri, IEvent event) {
@@ -46,6 +46,9 @@ public class DWebSocket extends WebSocketClient {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            if (iEvent.getPeerOperate() != null) {
+                iEvent.getPeerOperate().socketState("reConnect");
+            }
             this.iEvent.reConnect();
         } else {
             this.iEvent.logout("onClose");
@@ -57,12 +60,15 @@ public class DWebSocket extends WebSocketClient {
     public void onError(Exception ex) {
         Log.e("dds_error", "onError:" + ex.toString());
         this.iEvent.logout("onError");
-        connectFlag = false;
+//        connectFlag = false;
     }
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         Log.e("dds_info", "onOpen,connectFlag=" + connectFlag);
+        if (iEvent.getPeerOperate() != null) {
+            iEvent.getPeerOperate().socketState("onOpen");
+        }
         this.iEvent.onOpen();
         if (connectFlag) {
             //重连进入房间
@@ -95,6 +101,9 @@ public class DWebSocket extends WebSocketClient {
         Map map = JSON.parseObject(message, Map.class);
         String eventName = (String) map.get("eventName");
         if (eventName == null) return;
+        if (iEvent.getPeerOperate() != null) {
+            iEvent.getPeerOperate().socketState(eventName);
+        }
         // 登录成功
         if (eventName.equals("_login_success")) {
             handleLogin(map);
@@ -323,6 +332,19 @@ public class DWebSocket extends WebSocketClient {
 //        map.put("user_id", myId);
 
 //        map.put("data", childMap);
+        JSONObject object = new JSONObject(map);
+        final String jsonString = object.toString();
+        Log.d(TAG, "send-->" + jsonString);
+        send(jsonString);
+    }
+
+    public void reJoinRoom(String room, int re_inroom) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("ct", "skyrtc");
+        map.put("ac", "join_room");
+        map.put("room_id", room);
+        map.put("re_inroom", re_inroom);
+
         JSONObject object = new JSONObject(map);
         final String jsonString = object.toString();
         Log.d(TAG, "send-->" + jsonString);

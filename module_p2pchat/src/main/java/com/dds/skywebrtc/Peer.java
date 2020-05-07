@@ -39,6 +39,8 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
     private boolean isOffer;
     private Context mContext;
 
+    private boolean isIceRestart;
+
     public Peer(Context context, CallSession session, String userId) {
         this.mSession = session;
         this.pc = createPeerConnection();
@@ -74,6 +76,13 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
         if (pc == null) return;
         pc.createAnswer(this, offerOrAnswerConstraint());
 
+    }
+
+    public void iceRestart() {
+        if (pc == null) return;
+        this.isOffer = true;
+        this.isIceRestart = true;
+        pc.createOffer(this, offerOrAnswerRestartConstraint());
     }
 
     public void setRemoteDescription(SessionDescription sdp) {
@@ -121,10 +130,22 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
     @Override
     public void onIceConnectionChange(PeerConnection.IceConnectionState newState) {
         Log.i(TAG, "onIceConnectionChange: " + newState.toString());
-        if (mSession._callState != EnumType.CallState.Connected) return;
-        if (newState == PeerConnection.IceConnectionState.DISCONNECTED) {
 
+        if (newState == PeerConnection.IceConnectionState.CONNECTED) {
+            mSession.peerOperator.connectedComplete();
+        } else if (newState == PeerConnection.IceConnectionState.FAILED) {
+            mSession.peerOperator.connectedFailed();
         }
+
+        if (mSession._callState != EnumType.CallState.Connected) return;
+        if (newState == PeerConnection.IceConnectionState.DISCONNECTED || newState == PeerConnection.IceConnectionState.FAILED) {
+            if (mSession.lastDisconnectedTime > 0 && (System.currentTimeMillis() - mSession.lastDisconnectedTime) / 1000 < 10) {
+                iceRestart();
+                mSession.peerOperator.iceRestart();
+                mSession.lastDisconnectedTime = 0;
+            }
+        }
+
     }
 
     @Override
@@ -148,7 +169,7 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            mSession.peerOperator.sendCandidate();
             mSession.avEngineKit.mEvent.sendIceCandidate(userId, candidate.sdpMid, candidate.sdpMLineIndex, candidate.sdp);
         });
 
@@ -203,25 +224,32 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
         String sdpString = origSdp.description;
         final SessionDescription sdp = new SessionDescription(origSdp.type, sdpString);
         localSdp = sdp;
+        mSession.peerOperator.createSdpSuccess();
+
         mSession.executor.execute(() -> pc.setLocalDescription(this, sdp));
     }
 
     @Override
     public void onSetSuccess() {
         mSession.executor.execute(() -> {
+            mSession.peerOperator.setSdpSuccess();
+
             Log.d(TAG, "sdp连接成功   " + pc.signalingState().toString());
             if (pc == null) return;
             // 发送者
             if (isOffer) {
-                if (pc.getRemoteDescription() == null) {
+                if (pc.getRemoteDescription() == null||isIceRestart) {
                     Log.d(TAG, "Local SDP set succesfully");
                     if (!isOffer) {
                         //接收者，发送Answer
+                        mSession.peerOperator.sendAnswer();
                         mSession.avEngineKit.mEvent.sendAnswer(userId, localSdp.description);
                     } else {
                         //发送者,发送自己的offer
+                        mSession.peerOperator.sendOffer();
                         mSession.avEngineKit.mEvent.sendOffer(userId, localSdp.description);
                     }
+                    isIceRestart = false;
                 } else {
                     Log.d(TAG, "Remote SDP set succesfully");
 
@@ -232,9 +260,12 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
                 if (pc.getLocalDescription() != null) {
                     Log.d(TAG, "Local SDP set succesfully");
                     if (!isOffer) {
+                        mSession.peerOperator.sendAnswer();
+
                         //接收者，发送Answer
                         mSession.avEngineKit.mEvent.sendAnswer(userId, localSdp.description);
                     } else {
+                        mSession.peerOperator.sendOffer();
                         //发送者,发送自己的offer
                         mSession.avEngineKit.mEvent.sendOffer(userId, localSdp.description);
                     }
@@ -279,6 +310,15 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
         return mediaConstraints;
     }
 
+    private MediaConstraints offerOrAnswerRestartConstraint() {
+        MediaConstraints mediaConstraints = new MediaConstraints();
+        ArrayList<MediaConstraints.KeyValuePair> keyValuePairs = new ArrayList<>();
+        keyValuePairs.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
+        keyValuePairs.add(new MediaConstraints.KeyValuePair("IceRestart", "true"));
+        keyValuePairs.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
+        mediaConstraints.mandatory.addAll(keyValuePairs);
+        return mediaConstraints;
+    }
 
     /////////////////////////////DataChannel=============
 

@@ -3,6 +3,8 @@ package com.dds.skywebrtc;
 import android.app.Application;
 import android.content.Context;
 import android.media.AudioManager;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.dds.skywebrtc.render.ProxyVideoSink;
@@ -33,6 +35,7 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 import org.webrtc.audio.AudioDeviceModule;
 import org.webrtc.audio.JavaAudioDeviceModule;
+import org.webrtc.voiceengine.WebRtcAudioUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -81,6 +84,9 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     private AudioDeviceModule audioDeviceModule;
     private boolean isSwitch = false; // 是否正在切换摄像头
 
+    public long lastDisconnectedTime;
+
+    public PeerOperator peerOperator;
 
     public CallSession(SkyEngineKit avEngineKit, Context context, boolean audioOnly) {
         this.avEngineKit = avEngineKit;
@@ -90,6 +96,10 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
         this.mIsAudioOnly = audioOnly;
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         networkMonitor = NetworkMonitor.getInstance();
+    }
+
+    public void setPeerOperator(PeerOperator peerOperator){
+        this.peerOperator = peerOperator;
     }
 
 
@@ -463,6 +473,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     }
 
     public void onReceiveOffer(String userId, String description) {
+        peerOperator.receiveOffer();
         executor.execute(() -> {
             SessionDescription sdp = new SessionDescription(SessionDescription.Type.OFFER, description);
             if (mPeer != null) {
@@ -478,6 +489,8 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     public void onReceiverAnswer(String userId, String sdp) {
         Log.e("dds_test", "onReceiverAnswer:" + userId);
+        peerOperator.receiveAnswer();
+
         executor.execute(() -> {
             SessionDescription sessionDescription = new SessionDescription(SessionDescription.Type.ANSWER, sdp);
             if (mPeer != null) {
@@ -500,7 +513,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     // 对方离开房间
     public void onLeave(String userId) {
-        release();
+        if(!TextUtils.isEmpty(userId)) release();
     }
 
 
@@ -513,6 +526,11 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 //                        connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_3G ||
 //                        connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_2G) {
 //        }
+
+        executor.execute(() -> {
+            if(!NetConnectUtil.isNetworkOnline()) lastDisconnectedTime = System.currentTimeMillis();
+        });
+
     }
     // --------------------------------界面显示相关-------------------------------------------------
 
