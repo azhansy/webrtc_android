@@ -417,116 +417,116 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
 
     @Override
     public void createSdpSuccess() {
-        sb.append("----------------------------\n");
-        sb.append("createSdpSuccess");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("createSdpSuccess");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void sendOffer() {
-        sb.append("----------------------------\n");
-        sb.append("sendOffer");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("sendOffer");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void sendAnswer() {
-        sb.append("----------------------------\n");
-        sb.append("sendAnswer");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("sendAnswer");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void sendCandidate() {
-        sb.append("----------------------------\n");
-        sb.append("sendCandidate");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("sendCandidate");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void setSdpSuccess() {
-        sb.append("----------------------------\n");
-        sb.append("setSdpSuccess");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("setSdpSuccess");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void iceRestart() {
-        sb.append("----------------------------\n");
-        sb.append("iceRestart");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("iceRestart");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void connectedComplete() {
-        sb = new StringBuffer();
-        tvOpera.setText("");
+//        sb = new StringBuffer();
+//        tvOpera.setText("");
     }
 
     @Override
     public void connectedFailed() {
-        sb.append("?????????????????????\n");
-        sb.append("ICE connected Failed");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("?????????????????????\n");
+//        sb.append("ICE connected Failed");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void receiveOffer() {
-        sb.append("----------------------------\n");
-        sb.append("receiveOffer");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("receiveOffer");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void receiveAnswer() {
-        sb.append("----------------------------\n");
-        sb.append("receiveAnswer");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("receiveAnswer");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void socketOpen(int offerSize, int iceSize) {
-        sb.append("----------------------------\n");
-        sb.append("socketOpen");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("socketOpen");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void loginSuccess(String userId) {
-        sb.append("----------------------------\n");
-        sb.append("loginSuccess");
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append("loginSuccess");
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     @Override
     public void socketState(String state) {
-        sb.append("----------------------------\n");
-        sb.append(state);
-        sb.append("\n\n");
-        tvOpera.setText(sb.toString());
-        scrollToBottom();
+//        sb.append("----------------------------\n");
+//        sb.append(state);
+//        sb.append("\n\n");
+//        tvOpera.setText(sb.toString());
+//        scrollToBottom();
     }
 
     private void scrollToBottom() {
