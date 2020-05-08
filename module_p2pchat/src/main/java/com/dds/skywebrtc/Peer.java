@@ -14,10 +14,8 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,7 @@ import java.util.List;
  */
 public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.Observer {
     private final static String TAG = "dds_Peer";
-    private PeerConnection pc;
+    PeerConnection pc;
     private DataChannel mDataChannel;
     private String userId;
     private List<IceCandidate> queuedRemoteCandidates;
@@ -238,7 +236,7 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
             if (pc == null) return;
             // 发送者
             if (isOffer) {
-                if (pc.getRemoteDescription() == null||isIceRestart) {
+                if (pc.getRemoteDescription() == null || isIceRestart) {
                     Log.d(TAG, "Local SDP set succesfully");
                     if (!isOffer) {
                         //接收者，发送Answer
@@ -374,10 +372,9 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
 
             FileUtils.appendFileWithInstream(filePath,
                     new ByteArrayInputStream(fileStr.getBytes()),
-                    block_size*chunk);
+                    block_size * chunk);
         }
     }
-
 
 
     void sendDataChannelMessage(String filePath, String sendId) {

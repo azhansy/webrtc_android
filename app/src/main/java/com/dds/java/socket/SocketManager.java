@@ -43,6 +43,11 @@ public class SocketManager implements IEvent {
     private List<UserIceCandidate> candidateList = new ArrayList<>();
     public PeerOperator peerOperator;
 
+    public void clear() {
+        offer = null;
+        candidateList.clear();
+    }
+
     private SocketManager() {
 
     }
@@ -117,7 +122,7 @@ public class SocketManager implements IEvent {
         //服务器在连接成功后，没有返回loginSuccess，我们自己调用一下
         loginSuccess(myId, "");
 
-        if (webSocket != null && webSocket.connectFlag) {
+        if (webSocket != null && webSocket.connectFlag&&SkyEngineKit.Instance().getCurrentSession().mRoom != null) {
             webSocket.reJoinRoom(SkyEngineKit.Instance().getCurrentSession().mRoom, 1);
         }
 

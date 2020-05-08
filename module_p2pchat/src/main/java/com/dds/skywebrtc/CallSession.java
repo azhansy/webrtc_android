@@ -3,7 +3,8 @@ package com.dds.skywebrtc;
 import android.app.Application;
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.audiofx.AcousticEchoCanceler;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -23,6 +24,7 @@ import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.NetworkMonitor;
 import org.webrtc.NetworkMonitorAutoDetect;
+import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
 import org.webrtc.SessionDescription;
@@ -35,12 +37,14 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 import org.webrtc.audio.AudioDeviceModule;
 import org.webrtc.audio.JavaAudioDeviceModule;
-import org.webrtc.voiceengine.WebRtcAudioUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static org.webrtc.NetworkMonitorAutoDetect.ConnectionType.CONNECTION_NONE;
+import static org.webrtc.NetworkMonitorAutoDetect.ConnectionType.CONNECTION_UNKNOWN;
 
 /**
  * Created by dds on 2019/8/19.
@@ -48,6 +52,9 @@ import java.util.concurrent.Executors;
  */
 public class CallSession implements NetworkMonitor.NetworkObserver {
     private final static String TAG = "dds_CallSession";
+
+    private final static int TIME_TO_CLOSE = 15;
+
     public WeakReference<CallSessionCallback> sessionCallback;
     public SkyEngineKit avEngineKit;
     public ExecutorService executor;
@@ -88,6 +95,9 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     public PeerOperator peerOperator;
 
+    private Handler stateChecker = new Handler(Looper.myLooper());
+    private NetworkMonitorAutoDetect.ConnectionType mConnectionType;
+
     public CallSession(SkyEngineKit avEngineKit, Context context, boolean audioOnly) {
         this.avEngineKit = avEngineKit;
         mRootEglBase = EglBase.create();
@@ -98,7 +108,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
         networkMonitor = NetworkMonitor.getInstance();
     }
 
-    public void setPeerOperator(PeerOperator peerOperator){
+    public void setPeerOperator(PeerOperator peerOperator) {
         this.peerOperator = peerOperator;
     }
 
@@ -192,6 +202,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     // 离开房间
     public void leave() {
+        mRoom = null;
         executor.execute(() -> {
             if (avEngineKit.mEvent != null) {
                 avEngineKit.mEvent.sendLeave(mRoom, mMyId);
@@ -513,7 +524,9 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     // 对方离开房间
     public void onLeave(String userId) {
-        if(!TextUtils.isEmpty(userId)) release();
+        if (!TextUtils.isEmpty(userId)) {
+            release();
+        }
     }
 
 
@@ -526,11 +539,35 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 //                        connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_3G ||
 //                        connectionType == NetworkMonitorAutoDetect.ConnectionType.CONNECTION_2G) {
 //        }
-
+        mConnectionType = connectionType;
         executor.execute(() -> {
-            if(!NetConnectUtil.isNetworkOnline()) lastDisconnectedTime = System.currentTimeMillis();
+            if (!NetConnectUtil.isNetworkOnline()) {
+                lastDisconnectedTime = System.currentTimeMillis();
+                stateChecker.postDelayed(() -> {
+                    Log.e(TAG, "onConnectionTypeChanged" + mConnectionType.toString());
+                    if (mConnectionType == CONNECTION_UNKNOWN || mConnectionType == CONNECTION_NONE) {
+                        leave();
+                        return;
+                    }
+                    checkSessionState();
+                }, TIME_TO_CLOSE);
+            }
         });
 
+    }
+
+    private void checkSessionState() {
+        if (mPeer == null) {
+            return;
+        }
+        PeerConnection.IceConnectionState iceConnectionState = mPeer.pc.iceConnectionState();
+        Log.e(TAG, "iceConnectionState :" + iceConnectionState.toString());
+
+        if (iceConnectionState == PeerConnection.IceConnectionState.FAILED || iceConnectionState == PeerConnection.IceConnectionState.CLOSED) {
+            Log.e(TAG, "checkSessionState : release");
+
+            leave();
+        }
     }
     // --------------------------------界面显示相关-------------------------------------------------
 

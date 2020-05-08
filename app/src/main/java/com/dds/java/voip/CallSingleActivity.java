@@ -19,6 +19,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.dds.App;
+import com.dds.java.SimpleActivityLifecycleCallbacks;
+import com.dds.java.socket.SocketManager;
 import com.dds.skywebrtc.CallSession;
 import com.dds.skywebrtc.EnumType;
 import com.dds.skywebrtc.PeerOperator;
@@ -37,7 +39,7 @@ import java.util.UUID;
  * android_shuai@163.com
  * 单聊界面
  */
-public class CallSingleActivity extends AppCompatActivity implements CallSession.CallSessionCallback {
+public class CallSingleActivity extends AppCompatActivity implements CallSession.CallSessionCallback, SimpleActivityLifecycleCallbacks.BackgroundObserver {
 
     public static final String EXTRA_TARGET = "targetId";
     public static final String EXTRA_MO = "isOutGoing";
@@ -101,7 +103,7 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
             if (isAudioOnly) {
                 per = new String[]{Manifest.permission.RECORD_AUDIO};
             } else {
-                per = new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA};
+                per = new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.FOREGROUND_SERVICE};
             }
             Permissions.request(this, per, integer -> {
                 if (integer == 0) {
@@ -114,6 +116,7 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
             });
         }
 
+        SimpleActivityLifecycleCallbacks.instance.setBackgroundObserver(this);
 
     }
 
@@ -195,6 +198,7 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
     // ======================================界面回调================================
     @Override
     public void didCallEndWithReason(EnumType.CallEndReason var1) {
+        SocketManager.getInstance().clear();
         finish();
     }
 
@@ -260,5 +264,10 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackground() {
+        showFloatingView();
     }
 }

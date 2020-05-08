@@ -2,6 +2,8 @@ package com.dds;
 
 import android.app.Application;
 
+import com.dds.java.SimpleActivityLifecycleCallbacks;
+
 //import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -20,7 +22,7 @@ public class App extends Application {
 //        }
 //        LeakCanary.install(this);
 
-
+        registerActivityLifecycleCallbacks(SimpleActivityLifecycleCallbacks.instance);
     }
 
     public static App getInstance() {
