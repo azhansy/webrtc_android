@@ -2,7 +2,8 @@ package com.dds;
 
 import android.app.Application;
 
-import com.dds.java.SimpleActivityLifecycleCallbacks;
+import com.dds.skywebrtc.client.SimpleActivityLifecycleCallbacks;
+import com.dds.skywebrtc.client.voip.SkyWebrtcUtils;
 
 //import com.squareup.leakcanary.LeakCanary;
 
@@ -22,6 +23,7 @@ public class App extends Application {
 //        }
 //        LeakCanary.install(this);
 
+        SkyWebrtcUtils.init(this);
         registerActivityLifecycleCallbacks(SimpleActivityLifecycleCallbacks.instance);
     }
 

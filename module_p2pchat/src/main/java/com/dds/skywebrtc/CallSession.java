@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.dds.skywebrtc.render.ProxyVideoSink;
 
@@ -93,7 +94,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     public long lastDisconnectedTime;
 
-    public PeerOperator peerOperator;
+//    public PeerOperator peerOperator;
 
     private Handler stateChecker = new Handler(Looper.myLooper());
     private NetworkMonitorAutoDetect.ConnectionType mConnectionType;
@@ -108,9 +109,9 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
         networkMonitor = NetworkMonitor.getInstance();
     }
 
-    public void setPeerOperator(PeerOperator peerOperator) {
-        this.peerOperator = peerOperator;
-    }
+//    public void setPeerOperator(PeerOperator peerOperator) {
+//        this.peerOperator = peerOperator;
+//    }
 
 
     // ----------------------------------------各种控制--------------------------------------------
@@ -270,6 +271,11 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
             sessionCallback.get().didChangeMode(true);
         }
 
+    }
+
+    public void onSocketException(){
+        Toast.makeText(mContext, "socket exception !!!", Toast.LENGTH_LONG).show();
+//        release();
     }
 
     // 调整摄像头前置后置
@@ -484,7 +490,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     }
 
     public void onReceiveOffer(String userId, String description) {
-        peerOperator.receiveOffer();
+//        peerOperator.receiveOffer();
         executor.execute(() -> {
             SessionDescription sdp = new SessionDescription(SessionDescription.Type.OFFER, description);
             if (mPeer != null) {
@@ -500,7 +506,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     public void onReceiverAnswer(String userId, String sdp) {
         Log.e("dds_test", "onReceiverAnswer:" + userId);
-        peerOperator.receiveAnswer();
+//        peerOperator.receiveAnswer();
 
         executor.execute(() -> {
             SessionDescription sessionDescription = new SessionDescription(SessionDescription.Type.ANSWER, sdp);

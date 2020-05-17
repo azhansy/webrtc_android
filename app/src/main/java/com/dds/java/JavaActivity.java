@@ -1,36 +1,22 @@
 package com.dds.java;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.dds.java.socket.IUserState;
-import com.dds.java.socket.SocketManager;
-import com.dds.java.voip.CallSingleActivity;
-import com.dds.java.voip.VoipEvent;
 import com.dds.skywebrtc.SkyEngineKit;
-import com.dds.skywebrtc.permission.Permissions;
+import com.dds.skywebrtc.client.socket.IUserState;
+import com.dds.skywebrtc.client.socket.SocketManager;
+import com.dds.skywebrtc.client.voip.CallSingleActivity;
+import com.dds.skywebrtc.client.voip.VoipEvent;
 import com.dds.webrtc.R;
 
 /**
@@ -98,8 +84,7 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
     public void connect(View view) {
         SocketManager.getInstance().connect(
                 spinner.getSelectedItem().toString().trim(),
-                et_name.getText().toString().trim(),
-                device);
+                et_name.getText().toString().trim());
 
     }
 
