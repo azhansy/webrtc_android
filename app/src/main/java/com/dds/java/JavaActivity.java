@@ -12,12 +12,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.dds.skywebrtc.SkyEngineKit;
-import com.dds.skywebrtc.client.socket.IUserState;
-import com.dds.skywebrtc.client.socket.SocketManager;
-import com.dds.skywebrtc.client.voip.CallSingleActivity;
-import com.dds.skywebrtc.client.voip.VoipEvent;
 import com.dds.webrtc.R;
+
+import org.webrtc.awesome.SkyEngineKit;
+import org.webrtc.awesome.api.AweChatFactory;
+import org.webrtc.awesome.socket.IUserState;
+import org.webrtc.awesome.socket.SocketManager;
+import org.webrtc.awesome.voip.CallSingleActivity;
+import org.webrtc.awesome.voip.VoipEvent;
 
 /**
  * 拨打电话界面

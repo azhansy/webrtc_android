@@ -33,7 +33,9 @@ dependencies {
 
 
     // java
-    implementation project(path: ':module_p2pchat')
+//    implementation project(path: ':module_p2pchat')
+    implementation project(path: ':awesome_video_chat_sdk')
+
 //    implementation project(path: ':filepicker')
     implementation 'org.java-websocket:Java-WebSocket:1.4.0'
     implementation 'com.alibaba:fastjson:1.1.64.android'
