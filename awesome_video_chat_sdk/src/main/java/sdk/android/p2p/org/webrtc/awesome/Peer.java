@@ -184,7 +184,7 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
 
     @Override
     public void onAddStream(MediaStream stream) {
-        mSession._remoteStream = stream;
+        mSession.setRemoteStream(stream);
         Log.i(TAG, "onAddStream:");
         if (stream.audioTracks.size() > 0) {
             stream.audioTracks.get(0).setEnabled(true);

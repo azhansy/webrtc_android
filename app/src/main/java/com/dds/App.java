@@ -2,6 +2,7 @@ package com.dds;
 
 import android.app.Application;
 
+import org.webrtc.awesome.AweChat;
 import org.webrtc.awesome.SimpleActivityLifecycleCallbacks;
 import org.webrtc.awesome.voip.SkyWebrtcUtils;
 
@@ -24,8 +25,9 @@ public class App extends Application {
 //        }
 //        LeakCanary.install(this);
 
-        SkyWebrtcUtils.init(this);
-        registerActivityLifecycleCallbacks(SimpleActivityLifecycleCallbacks.instance);
+//        SkyWebrtcUtils.init(this);
+//        registerActivityLifecycleCallbacks(SimpleActivityLifecycleCallbacks.instance);
+        AweChat.init(this);
     }
 
     public static App getInstance() {

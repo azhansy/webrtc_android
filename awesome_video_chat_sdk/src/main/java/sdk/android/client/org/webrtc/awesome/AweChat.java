@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import org.webrtc.awesome.api.AweChatFactory;
 import org.webrtc.awesome.api.AweWebRtc;
+import org.webrtc.awesome.socket.IUserState;
 
 /**
  * @Author: hsh
@@ -30,9 +31,7 @@ public enum AweChat implements AweWebRtc {
 
     @Override
     public void login(@NonNull String signalServer, @NonNull String userId) {
-        if (aweWebRtc == null) {
-            throw new RuntimeException("AweWebRtc should be init first!");
-        }
+        checkAwe();
 
         if (TextUtils.isEmpty(signalServer)) {
             throw new IllegalArgumentException("signalServer can not be empty!");
@@ -47,17 +46,13 @@ public enum AweChat implements AweWebRtc {
 
     @Override
     public void logout() {
-        if (aweWebRtc == null) {
-            throw new RuntimeException("AweWebRtc should be init first!");
-        }
+        checkAwe();
         aweWebRtc.logout();
     }
 
     @Override
     public void startVideoChat(@NonNull Context context, @NonNull String dstUserId) {
-        if (aweWebRtc == null) {
-            throw new RuntimeException("AweWebRtc should be init first!");
-        }
+        checkAwe();
 
         if (TextUtils.isEmpty(dstUserId)) {
             throw new IllegalArgumentException("dstUserId can not be empty!");
@@ -67,13 +62,30 @@ public enum AweChat implements AweWebRtc {
 
     @Override
     public void startAudioChat(@NonNull Context context, @NonNull String dstUserId) {
-        if (aweWebRtc == null) {
-            throw new RuntimeException("AweWebRtc should be init first!");
-        }
+        checkAwe();
 
         if (TextUtils.isEmpty(dstUserId)) {
             throw new IllegalArgumentException("dstUserId can not be empty!");
         }
         aweWebRtc.startAudioChat(context, dstUserId);
+    }
+
+    @Override
+    public void setIUserStateCallback(IUserState userState) {
+        checkAwe();
+
+        aweWebRtc.setIUserStateCallback(userState);
+    }
+
+    @Override
+    public int getUserLoginState() {
+        checkAwe();
+        return aweWebRtc.getUserLoginState();
+    }
+
+    private void checkAwe() {
+        if (aweWebRtc == null) {
+            throw new RuntimeException("AweWebRtc should be init first!");
+        }
     }
 }

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import org.webrtc.awesome.SimpleActivityLifecycleCallbacks;
 import org.webrtc.awesome.SkyEngineKit;
+import org.webrtc.awesome.socket.IUserState;
 import org.webrtc.awesome.socket.SocketManager;
 import org.webrtc.awesome.voip.CallSingleActivity;
 import org.webrtc.awesome.voip.SkyWebrtcUtils;
@@ -43,5 +44,15 @@ class BaseAweWebRctImpl implements AweWebRtc {
     public void startAudioChat(@NonNull Context context, @NonNull String dstUserId) {
         SkyEngineKit.init(new VoipEvent());
         CallSingleActivity.openActivity(context, dstUserId, true, true);
+    }
+
+    @Override
+    public void setIUserStateCallback(IUserState userState) {
+        SocketManager.getInstance().addUserStateCallback(userState);
+    }
+
+    @Override
+    public int getUserLoginState() {
+        return SocketManager.getInstance().getUserState();
     }
 }

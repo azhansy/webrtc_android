@@ -1,8 +1,10 @@
 package org.webrtc.awesome.voip;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,12 +141,19 @@ public class FragmentAudio extends Fragment implements CallSession.CallSessionCa
                 incomingActionContainer.setVisibility(View.GONE);
                 outgoingActionContainer.setVisibility(View.VISIBLE);
                 descTextView.setVisibility(View.GONE);
-
+                checkVolume();
                 startRefreshTime();
             } else {
                 // do nothing now
             }
         });
+    }
+
+    private void checkVolume(){
+        AudioManager audioManager = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
+        int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL);
+        int streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL);
+        Log.d("AudioTrack", "streamMaxVolume = " + streamMaxVolume + ", streamVolume = " + streamVolume);
     }
 
     @Override

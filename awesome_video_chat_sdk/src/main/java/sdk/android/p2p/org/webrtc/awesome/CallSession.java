@@ -9,11 +9,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.webrtc.BuildConfig;
-import org.webrtc.awesome.render.ProxyVideoSink;
-
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
+import org.webrtc.BuildConfig;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraEnumerator;
@@ -39,6 +37,7 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 import org.webrtc.audio.AudioDeviceModule;
 import org.webrtc.audio.JavaAudioDeviceModule;
+import org.webrtc.awesome.render.ProxyVideoSink;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -230,7 +229,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 //            return true;
 //        }
         if (audioDeviceModule != null) {
-            audioDeviceModule.setMicrophoneMute(enable);
+            audioDeviceModule.setSpeakerMute(enable);
             return true;
         }
 
@@ -238,25 +237,32 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     }
 
+    public void setRemoteStream(MediaStream mediaStream) {
+        _remoteStream = mediaStream;
+        initVolume();
+    }
+
+    private void initVolume() {
+        int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL);
+        if (isAudioOnly()) {
+            audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, streamMaxVolume, 0);
+            audioManager.setSpeakerphoneOn(false);
+        } else {
+            audioManager.setStreamVolume(AudioManager.MODE_IN_CALL, streamMaxVolume/2, 0);
+            audioManager.setSpeakerphoneOn(true);
+        }
+    }
+
     // 设置扬声器
     public boolean toggleSpeaker(boolean enable) {
-//        if (audioManager != null) {
-//            if (enable) {
-//                audioManager.setSpeakerphoneOn(true);
-//                audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
-//                        audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL),
-//                        AudioManager.STREAM_VOICE_CALL);
-//            } else {
-//                audioManager.setSpeakerphoneOn(false);
-//                audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
-//                        audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL), AudioManager.STREAM_VOICE_CALL);
-//            }
-//
-//            return true;
-//        }
-
-        if (audioDeviceModule != null) {
-            audioDeviceModule.setSpeakerMute(enable);
+        if (audioManager != null) {
+            if (enable) {
+                audioManager.setMode(AudioManager.MODE_IN_CALL);
+                audioManager.setSpeakerphoneOn(true);
+            } else {
+                audioManager.setSpeakerphoneOn(false);
+                audioManager.setMode(AudioManager.STREAM_VOICE_CALL);
+            }
             return true;
         }
         return false;
@@ -265,6 +271,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     // 切换到语音通话
     public void switchToAudio() {
         mIsAudioOnly = true;
+        toggleSpeaker(false);
         // 告诉远端
         sendTransAudio();
         // 本地切换
@@ -274,7 +281,7 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     }
 
-    public void onSocketException(){
+    public void onSocketException() {
         Toast.makeText(mContext, "socket exception !!!", Toast.LENGTH_LONG).show();
 //        release();
     }

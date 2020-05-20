@@ -4,6 +4,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import org.webrtc.awesome.socket.IUserState;
+
 /**
  * @Author: hsh
  * @Description: SDK对外开发的api
@@ -34,4 +36,15 @@ public interface AweWebRtc {
      */
     void startAudioChat(@NonNull Context context, @NonNull String dstUserId);
 
+    /**
+     * 监听用户在信令服务器的登录状态
+     * @param userState
+     */
+    void setIUserStateCallback(IUserState userState);
+
+    /**
+     * 获取用户在信令服务器的登录状态
+     * @return 1 登录， 0 未登录
+     */
+    int getUserLoginState();
 }

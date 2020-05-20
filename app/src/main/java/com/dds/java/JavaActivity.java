@@ -14,12 +14,9 @@ import androidx.core.content.ContextCompat;
 
 import com.dds.webrtc.R;
 
-import org.webrtc.awesome.SkyEngineKit;
-import org.webrtc.awesome.api.AweChatFactory;
+import org.webrtc.awesome.AweChat;
 import org.webrtc.awesome.socket.IUserState;
 import org.webrtc.awesome.socket.SocketManager;
-import org.webrtc.awesome.voip.CallSingleActivity;
-import org.webrtc.awesome.voip.VoipEvent;
 
 /**
  * 拨打电话界面
@@ -31,7 +28,7 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
     Spinner spinner;
     private TextView user_state;
     private TextView tv_filepath;
-//    public static int FILE_REQUSET_CODE = 156;
+    //    public static int FILE_REQUSET_CODE = 156;
     public String[] FILE_TYPES = {"txt", "apk", "jpg", "gif", "png", "bmp", "webp", "mp4", "zip", "rar", "gz", "bz2", "xls", "xlsx", "pdf", "doc", "docx", "amr", "jpeg", "mp3", "rtf", "mov", "pptx", "ppt", "numbers", "key", "pages"};
 
 
@@ -71,8 +68,8 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
     private void initData() {
 //        wss.setText("wss://webrtcnodeali.aoidc.net:1443/ws?ct=skyrtc");
 //        wss.setText("ws://192.168.1.138:5000/ws");
-        SocketManager.getInstance().addUserStateCallback(this);
-        int userState = SocketManager.getInstance().getUserState();
+        AweChat.INSTANCE.setIUserStateCallback(this);
+        int userState = AweChat.INSTANCE.getUserLoginState();
         if (userState == 1) {
             loginState();
         } else {
@@ -84,10 +81,8 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
 
     // 登录
     public void connect(View view) {
-        SocketManager.getInstance().connect(
-                spinner.getSelectedItem().toString().trim(),
+        AweChat.INSTANCE.login(spinner.getSelectedItem().toString().trim(),
                 et_name.getText().toString().trim());
-
     }
 
     // 退出
@@ -98,16 +93,13 @@ public class JavaActivity extends AppCompatActivity implements IUserState {
     // 拨打语音
     public void call(View view) {
         String phone = ((TextView) findViewById(R.id.et_phone)).getText().toString().trim();
-        SkyEngineKit.init(new VoipEvent());
-        CallSingleActivity.openActivity(this, phone, true, true);
-
+        AweChat.INSTANCE.startAudioChat(this, phone);
     }
 
     // 拨打视频
     public void callVideo(View view) {
         String phone = ((TextView) findViewById(R.id.et_phone)).getText().toString().trim();
-        SkyEngineKit.init(new VoipEvent());
-        CallSingleActivity.openActivity(this, phone, true, false);
+        AweChat.INSTANCE.startVideoChat(this, phone);
     }
 
     @Override
