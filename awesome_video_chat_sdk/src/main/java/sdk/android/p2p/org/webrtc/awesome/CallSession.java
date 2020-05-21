@@ -243,11 +243,12 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
     }
 
     private void initVolume() {
-        int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL);
         if (isAudioOnly()) {
+            int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL);
             audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, streamMaxVolume, 0);
             audioManager.setSpeakerphoneOn(false);
         } else {
+            int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.MODE_IN_CALL);
             audioManager.setStreamVolume(AudioManager.MODE_IN_CALL, streamMaxVolume/2, 0);
             audioManager.setSpeakerphoneOn(true);
         }
