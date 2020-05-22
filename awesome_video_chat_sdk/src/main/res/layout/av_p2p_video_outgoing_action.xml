@@ -22,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="切换到语音"
+            android:visibility="gone"
             android:textColor="@android:color/white"
             android:textSize="10sp" />
 
@@ -30,7 +31,6 @@
     <LinearLayout
         android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
@@ -38,13 +38,14 @@
             android:id="@+id/outgoingHangupImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/av_hangup_selector" />
+            android:background="@drawable/ic_call_cancel" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="取消"
+            android:visibility="gone"
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 

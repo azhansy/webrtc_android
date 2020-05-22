@@ -8,7 +8,9 @@ import androidx.annotation.NonNull;
 
 import org.webrtc.awesome.api.AweChatFactory;
 import org.webrtc.awesome.api.AweWebRtc;
+import org.webrtc.awesome.api.DstUser;
 import org.webrtc.awesome.socket.IUserState;
+import org.webrtc.awesome.socket.SignalServerStateListener;
 
 /**
  * @Author: hsh
@@ -81,6 +83,12 @@ public enum AweChat implements AweWebRtc {
     public int getUserLoginState() {
         checkAwe();
         return aweWebRtc.getUserLoginState();
+    }
+
+    @Override
+    public void addOnSignalServerStateChangeListener(SignalServerStateListener mListener) {
+        checkAwe();
+        aweWebRtc.addOnSignalServerStateChangeListener(mListener);
     }
 
     private void checkAwe() {

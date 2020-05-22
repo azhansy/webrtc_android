@@ -3,7 +3,9 @@ package org.webrtc.awesome.voip;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,19 +16,24 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import org.webrtc.R;
 import org.webrtc.awesome.CallSession;
 import org.webrtc.awesome.EnumType;
+import org.webrtc.awesome.PeerStateListener;
 import org.webrtc.awesome.SkyEngineKit;
+import org.webrtc.awesome.api.DstUser;
+
+import static org.webrtc.awesome.voip.CallSingleActivity.EXTRA_USER;
 
 /**
  * Created by dds on 2018/7/26.
  * android_shuai@163.com
  * 语音通话控制界面
  */
-public class FragmentAudio extends Fragment implements CallSession.CallSessionCallback, View.OnClickListener {
+public class FragmentAudio extends Fragment implements CallSession.CallSessionCallback, View.OnClickListener, PeerStateListener {
     private ImageView minimizeImageView;
     private ImageView portraitImageView;  // 用户头像
     private TextView nameTextView;        // 用户昵称
@@ -103,9 +110,10 @@ public class FragmentAudio extends Fragment implements CallSession.CallSessionCa
         CallSession currentSession = gEngineKit.getCurrentSession();
         // 如果已经接通
         if (currentSession != null && currentSession.getState() == EnumType.CallState.Connected) {
-            descTextView.setVisibility(View.GONE); // 提示语
+//            descTextView.setVisibility(View.GONE); // 提示语
             outgoingActionContainer.setVisibility(View.VISIBLE);
             durationTextView.setVisibility(View.VISIBLE);
+            descTextView.setText("通话中...");
             startRefreshTime();
         } else {
             // 如果未接通
@@ -118,6 +126,11 @@ public class FragmentAudio extends Fragment implements CallSession.CallSessionCa
                 outgoingActionContainer.setVisibility(View.GONE);
                 incomingActionContainer.setVisibility(View.VISIBLE);
             }
+        }
+
+        if (currentSession != null&&!TextUtils.isEmpty(currentSession.mTargetId)) {
+            nameTextView.setText(currentSession.mTargetId);
+            currentSession.setPeerStateListener(this);
         }
 
     }
@@ -140,7 +153,8 @@ public class FragmentAudio extends Fragment implements CallSession.CallSessionCa
             if (state == EnumType.CallState.Connected) {
                 incomingActionContainer.setVisibility(View.GONE);
                 outgoingActionContainer.setVisibility(View.VISIBLE);
-                descTextView.setVisibility(View.GONE);
+//                descTextView.setVisibility(View.GONE);
+                descTextView.setText("通话中...");
                 checkVolume();
                 startRefreshTime();
             } else {
@@ -243,5 +257,35 @@ public class FragmentAudio extends Fragment implements CallSession.CallSessionCa
             durationTextView.setBase(SystemClock.elapsedRealtime() - (System.currentTimeMillis() - session.getStartTime()));
             durationTextView.start();
         }
+    }
+
+
+    @Override
+    public void onDisconnect() {
+        Log.d("PeerStateListener", "onDisconnect thread:" + Thread.currentThread().getName());
+        descTextView.setText("链接中断...");
+    }
+
+    @Override
+    public void onReconnecting() {
+        Log.d("PeerStateListener", "onReconnecting thread:" + Thread.currentThread().getName());
+        descTextView.setText("正在重新连接服务器...");
+    }
+
+    @Override
+    public void onConnected() {
+        Log.d("PeerStateListener", "onConnected thread:" + Thread.currentThread().getName());
+        descTextView.setText("通话中...");
+    }
+
+    @Override
+    public void onConnectedFail() {
+        Log.d("PeerStateListener", "onConnectedFail thread:" + Thread.currentThread().getName());
+        descTextView.setText("连接失败...");
+    }
+
+    @Override
+    public void onConnecting() {
+        descTextView.setText("正在连接服务器....");
     }
 }

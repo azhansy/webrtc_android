@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,14 +26,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import org.webrtc.R;
+import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.awesome.CallSession;
 import org.webrtc.awesome.EnumType;
 import org.webrtc.awesome.FileUtils;
-import org.webrtc.awesome.PeerOperator;
+import org.webrtc.awesome.PeerStateListener;
 import org.webrtc.awesome.SkyEngineKit;
+import org.webrtc.awesome.api.DstUser;
 import org.webrtc.awesome.permission.Permissions;
-
-import org.webrtc.SurfaceViewRenderer;
 
 
 /**
@@ -40,7 +41,7 @@ import org.webrtc.SurfaceViewRenderer;
  * android_shuai@163.com
  * 视频通话控制界面
  */
-public class FragmentVideo extends Fragment implements CallSession.CallSessionCallback, View.OnClickListener, PeerOperator {
+public class FragmentVideo extends Fragment implements CallSession.CallSessionCallback, View.OnClickListener, PeerStateListener {
 
     private FrameLayout fullscreenRenderer;
     private FrameLayout pipRenderer;
@@ -49,6 +50,7 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
     private TextView nameTextView;
     private TextView tv_file;
     private TextView descTextView;
+    private TextView tv_state;
     private ImageView minimizeImageView;
     private ImageView outgoingAudioOnlyImageView;
     private ImageView outgoingHangupImageView;
@@ -63,6 +65,8 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
     private ImageView connectedHangupImageView;
     private ImageView switchCameraImageView;
 
+    private ImageView ivAvatar;
+
     private View incomingActionContainer;
     private View outgoingActionContainer;
     private View connectedActionContainer;
@@ -75,6 +79,7 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
     private SurfaceViewRenderer localSurfaceView;
     private SurfaceViewRenderer remoteSurfaceView;
     private TextView tvOpera;
+    private DstUser dstUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,12 +99,14 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
 
     private void initView(View view) {
         fullscreenRenderer = view.findViewById(R.id.fullscreen_video_view);
+        ivAvatar = view.findViewById(R.id.iv_avatar);
         pipRenderer = view.findViewById(R.id.pip_video_view);
         inviteeInfoContainer = view.findViewById(R.id.inviteeInfoContainer);
         portraitImageView = view.findViewById(R.id.portraitImageView);
         tv_file = view.findViewById(R.id.tv_file);
         nameTextView = view.findViewById(R.id.nameTextView);
         descTextView = view.findViewById(R.id.descTextView);
+        tv_state = view.findViewById(R.id.tv_state);
         minimizeImageView = view.findViewById(R.id.minimizeImageView);
         outgoingAudioOnlyImageView = view.findViewById(R.id.outgoingAudioOnlyImageView);
         outgoingHangupImageView = view.findViewById(R.id.outgoingHangupImageView);
@@ -166,7 +173,10 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
             didReceiveRemoteVideoTrack();
         }
 
-
+        if (session != null&& !TextUtils.isEmpty(session.mTargetId)) {
+            nameTextView.setText(session.mTargetId);
+            session.setPeerStateListener(this);
+        }
     }
 
     @Override
@@ -412,176 +422,32 @@ public class FragmentVideo extends Fragment implements CallSession.CallSessionCa
 
     }
 
-    private StringBuffer sb = new StringBuffer();
-
     @Override
-    public void createSdpSuccess() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("createSdpSuccess");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
+    public void onDisconnect() {
+        Log.d("PeerStateListener", "onDisconnect thread:" + Thread.currentThread().getName());
+        tv_state.setText("链接中断...");
     }
 
     @Override
-    public void sendOffer() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("sendOffer");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
+    public void onReconnecting() {
+        Log.d("PeerStateListener", "onReconnecting thread:" + Thread.currentThread().getName());
+        tv_state.setText("正在重新连接服务器...");
     }
 
     @Override
-    public void sendAnswer() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("sendAnswer");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
+    public void onConnected() {
+        Log.d("PeerStateListener", "onConnected thread:" + Thread.currentThread().getName());
+        tv_state.setText("通话中...");
     }
 
     @Override
-    public void sendCandidate() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("sendCandidate");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
+    public void onConnectedFail() {
+        Log.d("PeerStateListener", "onConnectedFail thread:" + Thread.currentThread().getName());
+        tv_state.setText("连接失败...");
     }
 
     @Override
-    public void setSdpSuccess() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("setSdpSuccess");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
-    }
-
-    @Override
-    public void iceRestart() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("iceRestart");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
-    }
-
-    @Override
-    public void connectedComplete() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb = new StringBuffer();
-            tvOpera.setText("");
-        });
-
-    }
-
-    @Override
-    public void connectedFailed() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("?????????????????????\n");
-            sb.append("ICE connected Failed");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
-    }
-
-    @Override
-    public void receiveOffer() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("receiveOffer");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
-    }
-
-    @Override
-    public void receiveAnswer() {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("receiveAnswer");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-
-    }
-
-    @Override
-    public void socketOpen(int offerSize, int iceSize) {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("socketOpen");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-    }
-
-    @Override
-    public void loginSuccess(String userId) {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append("loginSuccess");
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-    }
-
-    @Override
-    public void socketState(String state) {
-        Log.d("ThreadTest", "currThread = " + Thread.currentThread().getName());
-        runOnUiThread(() -> {
-            sb.append("----------------------------\n");
-            sb.append(state);
-            sb.append("\n\n");
-            tvOpera.setText(sb.toString());
-            scrollToBottom();
-        });
-    }
-
-    private void scrollToBottom() {
-        int offset = tvOpera.getLineCount() * tvOpera.getLineHeight();
-        if (offset > tvOpera.getHeight()) {
-            tvOpera.scrollTo(0, offset - tvOpera.getHeight());
-        }
+    public void onConnecting() {
+        tv_state.setText("正在连接服务器....");
     }
 }

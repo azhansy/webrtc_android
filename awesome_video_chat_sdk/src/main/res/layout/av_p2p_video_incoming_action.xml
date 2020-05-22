@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="right"
-    android:orientation="vertical"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
-    android:paddingBottom="30dp">
+    android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:id="@+id/audioLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="100dp">
 
         <ImageView
             android:id="@+id/incomingAudioOnlyImageView"
@@ -23,12 +23,6 @@
             android:layout_height="wrap_content"
             android:src="@drawable/av_trans_audio" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="切换到语音接听"
-            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
@@ -37,9 +31,9 @@
         android:id="@+id/hangupLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/audioLayout"
+        android:layout_marginLeft="20dp"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="20dp"
+        android:layout_alignTop="@id/audioLayout"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -47,13 +41,14 @@
             android:id="@+id/incomingHangupImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/av_hangup_selector" />
+            android:src="@drawable/ic_call_cancel" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="挂断"
+            android:visibility="gone"
             android:textColor="@android:color/white" />
 
     </LinearLayout>
@@ -62,24 +57,24 @@
         android:id="@+id/acceptLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/audioLayout"
-        android:layout_alignLeft="@id/audioLayout"
-        android:layout_alignRight="@id/audioLayout"
-        android:layout_marginTop="20dp"
+        android:layout_alignTop="@id/audioLayout"
+        android:layout_marginRight="20dp"
         android:gravity="center"
+        android:layout_alignParentRight="true"
         android:orientation="vertical">
 
         <ImageView
             android:id="@+id/acceptImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/av_video_answer_selector" />
+            android:src="@drawable/ic_call_answer" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="接听"
+            android:visibility="gone"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

@@ -55,9 +55,9 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
     public PeerConnection createPeerConnection() {
         // 管道连接抽象类实现方法
         PeerConnection.RTCConfiguration rtcConfig = new PeerConnection.RTCConfiguration(mSession.avEngineKit.getIceServers());
-        rtcConfig.iceConnectionReceivingTimeout = 60*1000;
-        rtcConfig.iceUnwritableTimeMs = 15*1000;
-        rtcConfig.iceUnwritableMinChecks = 60;
+//        rtcConfig.iceConnectionReceivingTimeout = 60*1000;
+//        rtcConfig.iceUnwritableTimeMs = 15*1000;
+//        rtcConfig.iceUnwritableMinChecks = 60;
         return mSession._factory.createPeerConnection(rtcConfig, this);
     }
 
@@ -132,15 +132,17 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
     public void onIceConnectionChange(PeerConnection.IceConnectionState newState) {
         Log.i(TAG, "onIceConnectionChange: " + newState.toString());
 
-//        if (newState == PeerConnection.IceConnectionState.CONNECTED) {
-//            mSession.peerOperator.connectedComplete();
-//        } else if (newState == PeerConnection.IceConnectionState.FAILED) {
-//            mSession.peerOperator.connectedFailed();
-//        }
+        if (newState == PeerConnection.IceConnectionState.CONNECTED) {
+            mSession.onConnected();
+        } else if (newState == PeerConnection.IceConnectionState.FAILED) {
+            mSession.onConnectedFail();
+        }
 
         if (mSession._callState != EnumType.CallState.Connected) return;
         if (newState == PeerConnection.IceConnectionState.DISCONNECTED || newState == PeerConnection.IceConnectionState.FAILED) {
             if (mSession.lastDisconnectedTime > 0 && (System.currentTimeMillis() - mSession.lastDisconnectedTime) / 1000 < 10) {
+//                mSession.onDisconnect();
+                mSession.onReconnecting();
                 iceRestart();
 //                mSession.peerOperator.iceRestart();
                 mSession.lastDisconnectedTime = 0;
@@ -222,6 +224,7 @@ public class Peer implements SdpObserver, PeerConnection.Observer, DataChannel.O
     @Override
     public void onCreateSuccess(SessionDescription origSdp) {
         Log.d(TAG, "sdp创建成功       " + origSdp.type);
+        mSession.onConnecting();
         String sdpString = origSdp.description;
         final SessionDescription sdp = new SessionDescription(origSdp.type, sdpString);
         localSdp = sdp;

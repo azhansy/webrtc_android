@@ -1,8 +1,11 @@
 package org.webrtc.awesome;
 
 import android.app.Application;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -44,17 +47,14 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.webrtc.NetworkMonitorAutoDetect.ConnectionType.CONNECTION_NONE;
-import static org.webrtc.NetworkMonitorAutoDetect.ConnectionType.CONNECTION_UNKNOWN;
-
 /**
  * Created by dds on 2019/8/19.
  * 会话层
  */
-public class CallSession implements NetworkMonitor.NetworkObserver {
+public class CallSession implements NetworkMonitor.NetworkObserver, PeerStateListener {
     private final static String TAG = "dds_CallSession";
 
-    private final static int TIME_TO_CLOSE = 15;
+    private final static int TIME_TO_CLOSE = 15000;
 
     public WeakReference<CallSessionCallback> sessionCallback;
     public SkyEngineKit avEngineKit;
@@ -96,8 +96,10 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
 //    public PeerOperator peerOperator;
 
-    private Handler stateChecker = new Handler(Looper.myLooper());
+    private Handler stateChecker = new Handler(Looper.getMainLooper());
     private NetworkMonitorAutoDetect.ConnectionType mConnectionType;
+
+    private PeerStateListener peerStateListener;
 
     public CallSession(SkyEngineKit avEngineKit, Context context, boolean audioOnly) {
         this.avEngineKit = avEngineKit;
@@ -109,9 +111,9 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
         networkMonitor = NetworkMonitor.getInstance();
     }
 
-//    public void setPeerOperator(PeerOperator peerOperator) {
-//        this.peerOperator = peerOperator;
-//    }
+    public void setPeerStateListener(PeerStateListener peerStateListener) {
+        this.peerStateListener = peerStateListener;
+    }
 
 
     // ----------------------------------------各种控制--------------------------------------------
@@ -557,15 +559,16 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
         mConnectionType = connectionType;
         executor.execute(() -> {
             if (!NetConnectUtil.isNetworkOnline()) {
+                onDisconnect();
                 lastDisconnectedTime = System.currentTimeMillis();
-                stateChecker.postDelayed(() -> {
-                    Log.e(TAG, "onConnectionTypeChanged" + mConnectionType.toString());
-                    if (mConnectionType == CONNECTION_UNKNOWN || mConnectionType == CONNECTION_NONE) {
-                        leave();
-                        return;
-                    }
-                    checkSessionState();
-                }, TIME_TO_CLOSE);
+//                stateChecker.postDelayed(() -> {
+//                    Log.e(TAG, "onConnectionTypeChanged" + mConnectionType.toString());
+//                    if (mConnectionType == CONNECTION_UNKNOWN || mConnectionType == CONNECTION_NONE) {
+//                        leave();
+//                        return;
+//                    }
+//                    checkSessionState();
+//                }, TIME_TO_CLOSE);
             }
         });
 
@@ -775,6 +778,51 @@ public class CallSession implements NetworkMonitor.NetworkObserver {
 
     public void setSessionCallback(CallSessionCallback sessionCallback) {
         this.sessionCallback = new WeakReference<>(sessionCallback);
+    }
+
+    @Override
+    public void onDisconnect() {
+        stateChecker.post(() -> {
+            if (peerStateListener != null) {
+                peerStateListener.onDisconnect();
+            }
+        });
+    }
+
+    @Override
+    public void onReconnecting() {
+        stateChecker.post(() -> {
+            if (peerStateListener != null) {
+                peerStateListener.onReconnecting();
+            }
+        });
+    }
+
+    @Override
+    public void onConnected() {
+        stateChecker.post(() -> {
+            if (peerStateListener != null) {
+                peerStateListener.onConnected();
+            }
+        });
+    }
+
+    @Override
+    public void onConnectedFail() {
+        stateChecker.post(() -> {
+            if (peerStateListener != null) {
+                peerStateListener.onConnectedFail();
+            }
+        });
+    }
+
+    @Override
+    public void onConnecting() {
+        stateChecker.post(() -> {
+            if (peerStateListener != null) {
+                peerStateListener.onConnecting();
+            }
+        });
     }
 
     public interface CallSessionCallback {

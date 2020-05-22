@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import org.webrtc.awesome.socket.IUserState;
+import org.webrtc.awesome.socket.SignalServerStateListener;
 
 /**
  * @Author: hsh
@@ -47,4 +48,10 @@ public interface AweWebRtc {
      * @return 1 登录， 0 未登录
      */
     int getUserLoginState();
+
+    /**
+     * 监听信令服务器连接状态
+     * @param mListener
+     */
+    void addOnSignalServerStateChangeListener(SignalServerStateListener mListener);
 }

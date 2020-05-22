@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/black"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/fullscreen_video_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- calling -->
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="voip"
+        android:textSize="34sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="200dp"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="等待对方接受邀请..."
+        android:textSize="16sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
+        android:textColor="@android:color/white" />
+
+    <Chronometer
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20:30"
+        android:textSize="13sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_state"
+        android:textColor="@android:color/white" />
+
+    <ImageView
+        android:id="@+id/iv_audio"
+        app:layout_constraintTop_toBottomOf="@id/tv_time"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_call_audio"
+        android:layout_marginTop="77dp" />
+
+    <ImageView
+        android:id="@+id/iv_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_call_cancel"
+        android:layout_marginTop="100dp"
+        app:layout_constraintTop_toBottomOf="@id/iv_audio"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/gp_calling"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="tv_name, tv_state,tv_time,iv_cancel,iv_audio" />
+    <!-- calling end -->
+
+    <!-- called -->
+    <TextView
+        android:id="@+id/tv_called_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="voip"
+        android:textSize="34sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="200dp"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_called_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="等待对方接受邀请..."
+        android:textSize="16sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_called_name"
+        android:textColor="@android:color/white" />
+
+    <ImageView
+        android:id="@+id/iv_called_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_call_cancel"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginBottom="100dp"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/iv_called_answer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_call_answer"
+        android:layout_marginBottom="100dp"
+        android:layout_marginRight="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_called_audio"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_called_answer"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/iv_called_answer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_call_audio" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/gp_called"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="tv_called_name,tv_called_state,iv_called_cancel,iv_called_answer,iv_called_audio" />
+    <!-- called end -->
+
+    <!-- chatting-->
+    <TextView
+        android:id="@+id/tv_chat_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="voip"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_chat_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="等待对方接受邀请..."
+        android:textSize="16sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_chat_name"
+        android:textColor="@android:color/white" />
+
+    <Chronometer
+        android:id="@+id/tv_chat_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20:30"
+        android:textSize="13sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_chat_state"
+        android:textColor="@android:color/white" />
+
+    <ImageView
+        android:id="@+id/iv_revered"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_camera_rever"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="16dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_small_window"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/av_minimize"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/pip_video_view"
+        android:layout_width="100dp"
+        android:layout_height="140dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/iv_chat_audio"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="26dp" />
+
+    <ImageView
+        android:id="@+id/iv_chat_audio"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_chat_cancel"
+        app:layout_constraintBottom_toBottomOf="@id/iv_chat_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="38dp"
+        android:src="@drawable/ic_call_audio" />
+
+    <ImageView
+        android:id="@+id/iv_chat_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_call_cancel"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="56dp"
+        android:layout_marginRight="20dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_chat_mute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_call_mute"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_chat_cancel"
+        app:layout_constraintTop_toTopOf="@id/iv_chat_cancel"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/gp_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="iv_chat_mute,iv_chat_cancel,iv_chat_audio,pip_video_view,iv_small_window, iv_revered,tv_chat_time,tv_chat_state,tv_chat_name" />
+    <!-- chatting end-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

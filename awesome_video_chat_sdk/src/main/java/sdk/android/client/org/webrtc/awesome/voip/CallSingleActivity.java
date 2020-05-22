@@ -3,13 +3,15 @@ package org.webrtc.awesome.voip;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -20,13 +22,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import org.webrtc.R;
-import org.webrtc.awesome.SimpleActivityLifecycleCallbacks;
-import org.webrtc.awesome.socket.SocketManager;
 import org.webrtc.awesome.CallSession;
 import org.webrtc.awesome.EnumType;
+import org.webrtc.awesome.SimpleActivityLifecycleCallbacks;
 import org.webrtc.awesome.SkyEngineKit;
+import org.webrtc.awesome.api.DstUser;
 import org.webrtc.awesome.except.NotInitializedException;
 import org.webrtc.awesome.permission.Permissions;
+import org.webrtc.awesome.socket.SocketManager;
 
 import java.util.UUID;
 
@@ -42,6 +45,8 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
     public static final String EXTRA_MO = "isOutGoing";
     public static final String EXTRA_AUDIO_ONLY = "audioOnly";
     public static final String EXTRA_FROM_FLOATING_VIEW = "fromFloatingView";
+
+    public static final String EXTRA_USER = "extra_user";
 
     private Handler handler = new Handler();
     private boolean isOutgoing;
@@ -141,7 +146,7 @@ public class CallSingleActivity extends AppCompatActivity implements CallSession
             String room = UUID.randomUUID().toString() + System.currentTimeMillis();
             boolean b = gEngineKit.startOutCall(this, room, targetId, audioOnly);
             if (!b) {
-                finish();
+//                finish();
                 return;
             }
             CallSession session = gEngineKit.getCurrentSession();
